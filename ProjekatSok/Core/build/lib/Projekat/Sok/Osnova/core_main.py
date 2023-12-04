@@ -6,6 +6,7 @@ from Projekat.Sok.Osnova.Services.graph import (
     GraphVisualiserBase,
     GraphParserBase
 )
+from Projekat.Sok.Plagini.graphParserJSON import GraphParserJSON
 
 def consoleMenu(*args, **kwargs):
     plugins: List[Union] = kwargs.get("graphParsers", []) + kwargs.get("graphVisualisers", []) # ovde treba da ide typing Union[GraphParserBase, GraphVisualiserBase] ali za sad ne
@@ -33,9 +34,20 @@ def consoleMenu(*args, **kwargs):
         if choice == len(plugins):
             return
         elif 0 <= choice < len(plugins):
-            "Jos uvek nista nije implementirano"
+            poruka = izabrana_opcija(plugins[choice], **kwargs)
         else:
             error = True
+def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwargs):
+    try:
+        if isinstance(plugin, GraphParserJSON):
+            graf = plugin.load("example1.json")
+            return graf
+        elif isinstance(plugin, GraphVisualiserBase):
+            graf = kwargs["graf"]
+            return "nije implementirano"
+    except Exception as e:
+        print(f"Error: {e}")
+    return "Radi"
 
 
 def loadPlugins(pointName: str):

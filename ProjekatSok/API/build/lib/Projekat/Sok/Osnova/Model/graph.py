@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, id: int, value=None):  # Proci specifikaciju i dodati sta sve treba vrednosti, mozemo kao i vise atributa ili kao dictonary
+    def __init__(self, id, value=None):
         self.id = id
         self.value = value
         self.edges = []
