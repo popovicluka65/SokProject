@@ -1,0 +1,40 @@
+@prefix ex: <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# Individuals
+ex:Person1 rdf:type ex:Person .
+ex:Person2 rdf:type ex:Person .
+ex:Person3 rdf:type ex:Person .
+ex:Place1 rdf:type ex:Place .
+ex:Place2 rdf:type ex:Place .
+
+# Relationships
+ex:Person1 ex:knows ex:Person2 .
+ex:Person1 ex:knows ex:Person3 .
+ex:Person2 ex:hasFriend ex:Person3 .
+ex:Person1 ex:likes ex:Place1 .
+ex:Person2 ex:visited ex:Place2 .
+
+# Additional Triples (Extend as needed)
+ex:Person3 rdf:type ex:Person .
+ex:Person4 rdf:type ex:Person .
+ex:Person5 rdf:type ex:Person .
+ex:Place3 rdf:type ex:Place .
+ex:Place4 rdf:type ex:Place .
+
+ex:Person4 ex:knows ex:Person5 .
+ex:Person4 ex:visited ex:Place3 .
+ex:Person5 ex:hasFriend ex:Person3 .
+ex:Person5 ex:likes ex:Place4 .
+# Additional Triples (Extend as needed)
+ex:Person6 rdf:type ex:Person .
+ex:Person7 rdf:type ex:Person .
+ex:Person8 rdf:type ex:Person .
+ex:Place5 rdf:type ex:Place .
+ex:Place6 rdf:type ex:Place .
+
+ex:Person6 ex:knows ex:Person7 .
+ex:Person6 ex:knows ex:Person8 .
+ex:Person7 ex:hasFriend ex:Person8 .
+ex:Person6 ex:likes ex:Place5 .
+ex:Person7 ex:visited ex:Place6 .
