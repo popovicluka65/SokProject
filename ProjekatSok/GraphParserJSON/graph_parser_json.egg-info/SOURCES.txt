@@ -1,0 +1,15 @@
+setup.py
+Projekat/__init__.py
+Projekat/Sok/__init__.py
+Projekat/Sok/Plagini/__init__.py
+Projekat/Sok/Plagini/graphParserJSON.py
+Projekat/Sok/Plagini/graphParserJSONService.py
+file/example1.json
+graph_parser_json.egg-info/PKG-INFO
+graph_parser_json.egg-info/SOURCES.txt
+graph_parser_json.egg-info/dependency_links.txt
+graph_parser_json.egg-info/entry_points.txt
+graph_parser_json.egg-info/namespace_packages.txt
+graph_parser_json.egg-info/requires.txt
+graph_parser_json.egg-info/top_level.txt
+graph_parser_json.egg-info/zip-safe
