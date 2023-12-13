@@ -3,6 +3,7 @@ Projekat/__init__.py
 Projekat/Sok/__init__.py
 Projekat/Sok/Plagini/__init__.py
 Projekat/Sok/Plagini/graphVisualiserSimple.py
+Projekat/Sok/Plagini/graphVisualiserSimpleService.py
 graph_visualiser_simple.egg-info/PKG-INFO
 graph_visualiser_simple.egg-info/SOURCES.txt
 graph_visualiser_simple.egg-info/dependency_links.txt
