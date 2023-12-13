@@ -11,6 +11,7 @@ setup(
         'graph.parser':
             ['parser_JSON=Projekat.Sok.Plagini.graphParserJSON:GraphParserJSON'],
     },
+    data_files=[('file',['file/example1.json'])],
     install_requires=[
         'projekat-sok-api==0.1',
     ],
