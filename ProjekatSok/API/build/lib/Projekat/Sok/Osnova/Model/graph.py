@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, id: int, value=None):  # Proci specifikaciju i dodati sta sve treba vrednosti, mozemo kao i vise atributa ili kao dictonary
+    def __init__(self, id, value=None):  # Proci specifikaciju i dodati sta sve treba vrednosti, mozemo kao i vise atributa ili kao dictonary
         self.id = id
         self.value = value
         self.edges = []
@@ -65,6 +65,11 @@ class Graph:
                 maxIndex=index
             if index>maxIndex:
                 self.indices[index][1] += 1
+    def getNodeById(self,id):
+        for index in self.indices:
+            if index[0].id == id:
+                return index[0]
+        return None
 
     def __str__(self) -> str:
         ret = "[ nodes="

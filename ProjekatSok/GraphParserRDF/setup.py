@@ -11,6 +11,7 @@ setup(
         'graph.parser':
             ['parser_RDF=Projekat.Sok.Plagini.graphParserRDF:GraphParserRDF'],
     },
+    data_files=[('file', ['file/example1.ttl'])],
     install_requires=[
         'projekat-sok-api==0.1',
     ],
