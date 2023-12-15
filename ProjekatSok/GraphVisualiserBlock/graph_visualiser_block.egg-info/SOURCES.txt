@@ -3,6 +3,7 @@ Projekat/__init__.py
 Projekat/Sok/__init__.py
 Projekat/Sok/Plagini/__init__.py
 Projekat/Sok/Plagini/graphVisualiserBlock.py
+Projekat/Sok/Plagini/graphVisualiserBlockService.py
 graph_visualiser_block.egg-info/PKG-INFO
 graph_visualiser_block.egg-info/SOURCES.txt
 graph_visualiser_block.egg-info/dependency_links.txt
@@ -11,3 +12,4 @@ graph_visualiser_block.egg-info/namespace_packages.txt
 graph_visualiser_block.egg-info/requires.txt
 graph_visualiser_block.egg-info/top_level.txt
 graph_visualiser_block.egg-info/zip-safe
+template/block_visualizer.html

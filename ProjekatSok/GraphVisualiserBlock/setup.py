@@ -11,6 +11,7 @@ setup(
         'graph.visualiser':
             ['visualiser_block=Projekat.Sok.Plagini.graphVisualiserBlock:GraphVisualiserBlock'],
     },
+    data_files=[('template', ['template/block_visualizer.html'])],
     install_requires=[
         'projekat-sok-api==0.1',
     ],

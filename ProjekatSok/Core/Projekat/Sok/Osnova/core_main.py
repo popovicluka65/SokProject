@@ -1,11 +1,14 @@
 from typing import List, Union
 
 import pkg_resources
+
 from Projekat.Sok.Osnova.Services.graph import (
     GraphVisualiserBase,
     GraphParserBase
 )
-from Projekat.Sok.Plagini.graphParserJSON import GraphParserJSON
+
+globalni_niz = []
+
 
 def consoleMenu(*args, **kwargs):
     plugins: List[Union] = kwargs.get("graphParsers", []) + kwargs.get("graphVisualisers", []) # ovde treba da ide typing Union[GraphParserBase, GraphVisualiserBase] ali za sad ne
@@ -36,19 +39,20 @@ def consoleMenu(*args, **kwargs):
             poruka = izabrana_opcija(plugins[choice], **kwargs)
         else:
             error = True
+    return ""
+
 def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwargs):
+    global globalni_niz
     try:
-        if isinstance(plugin, GraphParserJSON):
-            graf = plugin.load("example1.json")
+        if isinstance(plugin, GraphParserBase):
+            graf = plugin.load(kwargs["file"])
+            globalni_niz.append(graf)
             return graf
-        elif isinstance(plugin, GraphVisualiserBase):
-            graf = kwargs["graf"]
-            return "nije implementirano"
+        if isinstance(plugin, GraphVisualiserBase):
+            plugin.visualize(globalni_niz[-1])
     except Exception as e:
         print(f"Error: {e}")
     return "Radi"
-
-
 def loadPlugins(pointName: str):
     plugins = []
     for ep in pkg_resources.iter_entry_points(group=pointName):
@@ -65,10 +69,10 @@ def main():
     graphVisualisers = loadPlugins("graph.visualiser") #isto za vizualizatore
 
     consoleMenu(graphParsers=graphParsers,
-                graphVisualisers=graphVisualisers)
+                graphVisualisers=graphVisualisers,
+                file="example1.json")
 
 
 
 if __name__ == "__main__":
     main()
-

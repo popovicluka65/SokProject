@@ -5,7 +5,7 @@ from Projekat.Sok.Osnova.Model.graph import *
 import os
 
 def get_absolute_path(file_path):
-    return os.path.join(os.path.dirname(__file__), "..", "..", "..", "..","..", "file", file_path)
+    return os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", "file", file_path)
 
 def load_config():
     file=get_absolute_path('config.json')

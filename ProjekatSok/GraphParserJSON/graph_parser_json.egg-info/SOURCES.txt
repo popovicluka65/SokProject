@@ -4,6 +4,7 @@ Projekat/Sok/__init__.py
 Projekat/Sok/Plagini/__init__.py
 Projekat/Sok/Plagini/graphParserJSON.py
 Projekat/Sok/Plagini/graphParserJSONService.py
+file/config.json
 file/example1.json
 graph_parser_json.egg-info/PKG-INFO
 graph_parser_json.egg-info/SOURCES.txt

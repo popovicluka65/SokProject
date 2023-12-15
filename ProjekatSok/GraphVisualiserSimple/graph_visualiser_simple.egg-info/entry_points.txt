@@ -1,2 +1,3 @@
 [graph.visualiser]
 visualiser_simple = Projekat.Sok.Plagini.graphVisualiserSimple:GraphVisualiserSimple
+

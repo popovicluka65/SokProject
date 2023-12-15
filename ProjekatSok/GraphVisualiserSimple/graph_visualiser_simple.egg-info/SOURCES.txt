@@ -12,3 +12,4 @@ graph_visualiser_simple.egg-info/namespace_packages.txt
 graph_visualiser_simple.egg-info/requires.txt
 graph_visualiser_simple.egg-info/top_level.txt
 graph_visualiser_simple.egg-info/zip-safe
+template/simple_visualizer.html

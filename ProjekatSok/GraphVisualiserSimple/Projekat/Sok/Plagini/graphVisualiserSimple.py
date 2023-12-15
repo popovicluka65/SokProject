@@ -11,5 +11,5 @@ class GraphVisualiserSimple(GraphVisualiserBase):
 
     def visualize(self, graph: Graph):
         simple_content=simpleVisualize(graph)
-        with open('simple.html', 'w') as file:
+        with open('simple.html', 'w', encoding="utf-8") as file:
             file.write(simple_content)
