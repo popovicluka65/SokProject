@@ -1,0 +1,3 @@
+[graph.parser]
+parser_JSON = Projekat.Sok.Plagini.graphParserJSON:GraphParserJSON
+
