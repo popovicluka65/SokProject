@@ -21,19 +21,19 @@ def add_node(tx, node):
 #         CREATE (a)-[:CONNECTED {value: $value}]->(b)
 #         """, id1=edge.firstNode.id, id2=edge.secondNode.id, value=edge.value)
 def write_graph_to_neo4j(graph, driver):
-    print("USAO GRAPH U FUNKCIJU")
-    print("EDGES")
-    print(graph)
-    print("INDICES")
-    with driver.session() as session:
-        for node in graph.indices:
-            print("NODE")
-            print(node[0])
-            print(type(node[0]))
-        #    session.write_transaction(add_node, node[0])
-        #
-        # for edge in graph.edges:
-        #     session.write_transaction(add_edge, edge)
+    # print("USAO GRAPH U FUNKCIJU")
+    # print("EDGES")
+    # print(graph)
+    # print("INDICES")
+    # with driver.session() as session:
+    #     for node in graph.indices:
+    #         print("NODE")
+    #         print(node[0])
+    #         print(type(node[0]))
+    #     #    session.write_transaction(add_node, node[0])
+    #     #
+    #     # for edge in graph.edges:
+    #     #     session.write_transaction(add_edge, edge)
     driver.close()
 
 def index(request):

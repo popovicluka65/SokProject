@@ -1,3 +1,2 @@
 [graph.parser]
 parser_RDF = Projekat.Sok.Plagini.graphParserRDF:GraphParserRDF
-
