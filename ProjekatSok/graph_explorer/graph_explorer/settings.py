@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,8 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'neo4j',
-    'neomodel',
+    'django_neomodel',
     'graph_explorer_app.apps.GraphExplorerAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -73,27 +73,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'graph_explorer.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-NEO4J_DATABASES = {
-    'default': {
-        'HOST': 'localhost',  # Promenite na adresu vaše Neo4j baze
-        'PORT': 7687,  # Promenite na port vaše Neo4j baze
-        'SCHEME': 'bolt',  # Bolt je preporučeni protokol za Neo4j
-        'USER': 'neo4j_user',  # Promenite na korisničko ime
-        'PASSWORD': 'neo4j_password',  # Promenite na lozinku
-    },
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -124,6 +103,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -134,3 +120,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+NEOMODEL_SIGNALS = True
+NEOMODEL_FORCE_TIMEZONE = False
+NEOMODEL_ENCRYPTED_CONNECTION = True
+NEOMODEL_MAX_POOL_SIZE = 50
+# NEO4J_USERNAME = os.environ.get('NEO4J_USERNAME', 'neo4j')
+# NEO4J_PASSWORD = os.environ.get('NEO4J_PASSWORD', 'password')
+# NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', f'neo4j://{NEO4J_USERNAME}:{NEO4J_PASSWORD}@localhost:7687')
+#NEOMODEL_NEO4J_BOLT_URL ='bolt://username:password@localhost:7687'
+NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL','bolt://neo4j:password@localhost:7687')
