@@ -15,12 +15,12 @@
   var graph = {
     nodes: [
       {% for point in points %}
-        {id: {{point.id}}},
+        {id: {{point.id | tojson | safe}}},
       {% endfor %}
     ],
     links: [
     {% for edge in edges %}
-        {source: {{edge.firstNode.id}}, target: {{edge.secondNode.id}} },
+        {source: {{edge.firstNode.id | tojson | safe}}, target: {{edge.secondNode.id | tojson | safe}} },
       {% endfor %}
     ]
   };

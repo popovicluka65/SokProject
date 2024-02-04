@@ -9,12 +9,12 @@
     var graph = {
         nodes: [
             {% for point in points %}
-            { id: {{ point.id }}, value: {{ point.value | tojson | safe }} },
+            { id: {{point.id | tojson | safe }}, value: {{ point.value | tojson | safe }} },
             {% endfor %}
         ],
         links: [
             {% for edge in edges %}
-            { source: {{ edge.firstNode.id }}, target: {{ edge.secondNode.id }} },
+            { source: {{ edge.firstNode.id | tojson | safe  }}, target: {{ edge.secondNode.id | tojson | safe }} },
             {% endfor %}
         ]
     };
