@@ -1,6 +1,9 @@
 from typing import List, Union
 
 import pkg_resources
+from neo4j import GraphDatabase
+import json
+from neomodel import db
 
 from Projekat.Sok.Osnova.Services.graph import (
     GraphVisualiserBase,
@@ -8,6 +11,10 @@ from Projekat.Sok.Osnova.Services.graph import (
 )
 
 globalni_niz = []
+
+URI = "bolt://localhost:7687"
+USERNAME = "neo4j"
+PASSWORD = "password"
 
 html_string = """
 <!DOCTYPE html>
@@ -207,6 +214,7 @@ def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwarg
         if isinstance(plugin, GraphParserBase):
             #graf = plugin.load(kwargs["file"])
             graf = plugin.load("example1.ttl")
+            #graf = plugin.load("example1.json")
             globalni_niz.append(graf)
             return graf
         if isinstance(plugin, GraphVisualiserBase):
@@ -237,8 +245,52 @@ def django():
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
     odabraniGraph = izabrana_opcija(graphParsers[0])
-    stringReprezentaicija = izabrana_opcija(graphVisualisers[1])
+    write_graph_to_neo4j(URI,USERNAME,PASSWORD,odabraniGraph)
+    stringReprezentaicija = izabrana_opcija(graphVisualisers[0])
     return odabraniGraph,stringReprezentaicija
+
+def write_graph_to_neo4j(uri, username, password, graph):
+
+    db.cypher_query("MATCH (n) DETACH DELETE n")
+    def create_node(tx, node):
+        value_json = json.dumps(node.value)
+        tx.run("CREATE (:Node {id: $id, properties: $value})", id=node.id, value=value_json)
+
+    def create_edge(tx, edge):
+        tx.run("MATCH (a:Node {id: $id1}), (b:Node {id: $id2}) "
+               "CREATE (a)-[:CONNECTED_TO {value: $value}]->(b)",
+               id1=edge.firstNode.id, id2=edge.secondNode.id, value=edge.value)
+
+    with GraphDatabase.driver(uri, auth=(username, password)) as driver:
+        with driver.session() as session:
+            for node, _ in graph.indices:
+                session.write_transaction(create_node, node)
+
+            for edge in graph.edges:
+                session.write_transaction(create_edge, edge)
+def retrieve_graph(tx):
+    result = tx.run("MATCH (n) OPTIONAL MATCH (n)-[r]-(m) RETURN COLLECT(DISTINCT n) AS nodes, COLLECT(DISTINCT r) AS relationships")
+    return result.data()
+
+def search_nodes(tx, search_query):
+    result = tx.run(
+        "MATCH (n) WHERE any(key in keys(n) where n[key] CONTAINS $search_query OR any(property in properties(n) where property CONTAINS $search_query)) RETURN n",
+        search_query=search_query
+    )
+    return [record["n"] for record in result]
+def search(search_query,filter_query):
+    print("UDJE U SEARCH")
+
+    driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
+
+    with driver.session() as session:
+        result = session.read_transaction(search_nodes, search_query)
+
+        #return result
+
+
+        #moramo konvertovati u nas pravi graph
+
 
 if __name__ == "__main__":
     main()

@@ -34,7 +34,32 @@ ex:Place5 rdf:type ex:Place .
 ex:Place6 rdf:type ex:Place .
 
 ex:Person6 ex:knows ex:Person7 .
+ex:Person2 ex:knows ex:Person8 .
 ex:Person6 ex:knows ex:Person8 .
 ex:Person7 ex:hasFriend ex:Person8 .
 ex:Person6 ex:likes ex:Place5 .
 ex:Person7 ex:visited ex:Place6 .
+
+ex:Person1 ex:name "John" .
+ex:Person1 ex:age 30 .
+
+ex:Person2 ex:name "Alice" .
+ex:Person2 ex:age 25 .
+
+ex:Person3 ex:name "Bob" .
+ex:Person3 ex:age 28 .
+
+ex:Person4 ex:name "Eva" .
+ex:Person4 ex:age 32 .
+
+ex:Person5 ex:name "Mike" .
+ex:Person5 ex:age 35 .
+
+ex:Person6 ex:name "Sophie" .
+ex:Person6 ex:age 27 .
+
+ex:Person7 ex:name "Chris" .
+ex:Person7 ex:age 31 .
+
+ex:Person8 ex:name "Lily" .
+ex:Person8 ex:age 25 .

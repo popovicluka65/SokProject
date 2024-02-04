@@ -20,5 +20,4 @@ def loadGraph(filePath):
             if graph.getNodeById(obj) is None:
                 graph.addNode(Node(obj, {}))
             graph.addEdge(Edge(subjectNode, graph.getNodeById(obj), predicate))
-    print(graph)
     return graph
