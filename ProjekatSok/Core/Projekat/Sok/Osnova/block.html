@@ -22,24 +22,24 @@
 
   var graph = {
     nodes: [
-      
+
         { id: 1, value: {"@id": "28dddab1-4aa7-6e2b-b0b2-7ed9096aa9bc", "name": "I\u0027m parent"} },
-      
+
         { id: 2, value: {"@id": "6616c598-0a0a-8263-7a56-fb0c0e16225a", "name": "I\u0027m first child"} },
-      
+
         { id: 3, value: {"@id": "940e60e4-9497-7c0d-3467-2dawdaw2", "name": "I\u0027m second child"} },
-      
+
     ],
     links: [
-      
+
         { source: 1, target: 2 },
-      
+
         { source: 1, target: 3 },
-      
+
         { source: 2, target: 1 },
-      
+
         { source: 3, target: 1 },
-      
+
     ]
   };
 
@@ -70,10 +70,10 @@ var nodes = nodeGroup
   .enter()
   .append("foreignObject")
   .attr("x", function (d) {
-    return d.x - calculateWidth(d) / 2; 
+    return d.x - calculateWidth(d) / 2;
   })
   .attr("y", function (d) {
-    return d.y - calculateHeight(d) / 2; 
+    return d.y - calculateHeight(d) / 2;
   })
   .attr("width", function (d) {
     return calculateWidth(d);
@@ -102,7 +102,7 @@ function calculateWidth(d) {
     .map(([key, val]) => `${key}: ${val}`)
     .join('\n');
 
-  var textWidth = getTextWidth(textContent, '14px Arial'); 
+  var textWidth = getTextWidth(textContent, '14px Arial');
   return Math.min(textWidth + 20, widthFactor * 20);
 }
 
@@ -112,7 +112,7 @@ function calculateHeight(d) {
     .join('\n');
 
   var textLines = textContent.split('\n').length;
-  return textLines * 20 + 20; 
+  return textLines * 20 + 20;
 }
 
 function getTextWidth(text, font) {

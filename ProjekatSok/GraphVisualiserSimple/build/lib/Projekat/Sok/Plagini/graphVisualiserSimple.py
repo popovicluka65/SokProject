@@ -11,11 +11,10 @@ class GraphVisualiserSimple(GraphVisualiserBase):
         return "GrafVisualiserSimple"
 
     def visualize(self, graph: Graph):
-        # print("UDJE U FUNKCIJU")
-        # simple_content=simpleVisualize(graph)
+        simple_content=simpleVisualize(graph)
         # with open('simple1.html', 'w', encoding="utf-8") as file:
         #     file.write(simple_content)
         # print("SIMPLE CONTENT")
         # print(simple_content)
         # return simple_content
-        return "A"
+        return simple_content
