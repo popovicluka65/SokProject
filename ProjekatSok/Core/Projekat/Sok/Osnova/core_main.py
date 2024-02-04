@@ -53,8 +53,8 @@ def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwarg
     try:
         if isinstance(plugin, GraphParserBase):
             #graf = plugin.load(kwargs["file"])
-            graf = plugin.load("example1.ttl")
-            #graf = plugin.load("example1.json")
+            #graf = plugin.load("example1.ttl")
+            graf = plugin.load("example1.json")
             globalni_niz.append(graf)
             return graf
         if isinstance(plugin, GraphVisualiserBase):
@@ -84,11 +84,11 @@ def main():
 def django():
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
-    odabraniGraph = izabrana_opcija(graphParsers[1])
+    odabraniGraph = izabrana_opcija(graphParsers[0])
     write_graph_to_neo4j(URI,USERNAME,PASSWORD,odabraniGraph)
     #afterSearch = search("25","", odabraniGraph)
     #write_graph_to_neo4j(URI,USERNAME,PASSWORD,afterSearch)
-    stringReprezentaicija = izabrana_opcija(graphVisualisers[1])
+    stringReprezentaicija = izabrana_opcija(graphVisualisers[0])
     return odabraniGraph,stringReprezentaicija
 def write_graph_to_neo4j(uri, username, password, graph):
 
