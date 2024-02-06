@@ -2,7 +2,8 @@ import datetime
 
 
 class Node:
-    def __init__(self, id, value=None):
+    def __init__(self, id, value=None, graph_name="NONAME"):
+        self.graph_name = graph_name
         self.id = id
         self.value = value
         self.edges = []
