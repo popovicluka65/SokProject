@@ -88,7 +88,7 @@ def django():
     write_graph_to_neo4j(URI,USERNAME,PASSWORD,odabraniGraph)
     #afterSearch = search("25","", odabraniGraph)
     #write_graph_to_neo4j(URI,USERNAME,PASSWORD,afterSearch)
-    stringReprezentaicija = izabrana_opcija(graphVisualisers[0])
+    stringReprezentaicija = izabrana_opcija(graphVisualisers[1])
     return odabraniGraph,stringReprezentaicija
 def write_graph_to_neo4j(uri, username, password, graph):
 

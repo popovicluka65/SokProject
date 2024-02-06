@@ -67,8 +67,8 @@
         }
 
         #tree-bird {
-            width: 25%;
-            border-right: 1px solid #333;
+            width: 40%;
+            border-left: 1px solid #333;
             display: flex;
             flex-direction: column;
         }
@@ -79,7 +79,7 @@
         }
         
         #tree {
-            height: 60%;
+            height: 100%;
             border-bottom: 1px solid #333;
         }
 
@@ -105,16 +105,18 @@
     <button>Apply</button>
 </div>
 <div id="graph-view">
-    <div id="tree-bird">
-        <div id="tree">
-
-        </div>
-        <div id="bird">
-        </div>
-    </div>
     <div id="main">
         {{ graph | safe }}
     </div>
+    <div id="tree-bird">
+        <div id="tree">
+            {% include "tree_view.html" %}
+        </div>
+        <div id="bird">
+            {% include "bird_view.html" %}
+        </div>
+    </div>
+    
 </div>
 </body>
 </html>
