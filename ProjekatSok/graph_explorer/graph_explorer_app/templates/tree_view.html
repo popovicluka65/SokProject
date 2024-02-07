@@ -32,7 +32,7 @@
             return tree;
         }
 
-        const rootNodeId = "http://example.org/Person1";
+
         data=buildGraph(graphCopy,rootNodeId);
 
         function addChildrenToLeafNode(graph, node, targetNodeId, targetNodeUId) {
@@ -83,6 +83,15 @@
             .attr("height", heightWindow)
             .attr("style", "max-width: 100%; height: 100%; font: 10px sans-serif; user-select: none;");
 
+        function zoomed(event) {
+            const { transform } = event;
+            const scaleFactor = 0.3; // Adjust this value to control the panning speed
+            const translatedX = transform.x * scaleFactor;
+            const translatedY = transform.y * scaleFactor;
+            const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
+            gNode.attr("transform", newTransform);
+            gLink.attr("transform", newTransform);
+        }
         const zoom = d3.zoom()
         .scaleExtent([0.1, 10])
         .on("zoom", zoomed);
@@ -99,6 +108,8 @@
             .attr("pointer-events", "all");
 
         function update(event, source) {
+            console.log("FFDFDFD")
+
             const duration = event?.altKey ? 2500 : 250; // hold the alt key to slow down the transition
             const nodes = root.descendants().reverse();
             const links = root.links();
@@ -193,6 +204,7 @@
                 d.x0 = d.x;
                 d.y0 = d.y;
             });
+
         }
 
         // Do the first update to the initial configuration of the tree — where a number of nodes
@@ -206,14 +218,5 @@
                 { d.children = null; }
         });
 
-        function zoomed(event) {
-            const { transform } = event;
-            const scaleFactor = 0.3; // Adjust this value to control the panning speed
-            const translatedX = transform.x * scaleFactor;
-            const translatedY = transform.y * scaleFactor;
-            const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
-            gNode.attr("transform", newTransform);
-            gLink.attr("transform", newTransform);
-        }
         update(null, root);
 </script>

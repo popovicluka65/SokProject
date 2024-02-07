@@ -9,5 +9,7 @@ from .models import *
 
 def index(request):
     graph, stringHTML = django()
-    #search("Person","AAA",graph)
-    return render(request, 'proba.html', {"graph": stringHTML})
+    graph_visualisers = plugin_visualisators()
+    plugin_parses = plugin_parsers()
+    return render(request, 'proba.html', {"graph": stringHTML,'graphVisualisers': graph_visualisers,
+                                          'pluginsParsers':plugin_parses})
