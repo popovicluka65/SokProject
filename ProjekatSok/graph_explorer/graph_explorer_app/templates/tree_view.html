@@ -1,0 +1,219 @@
+<!-- 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Tree Visualization</title>
+    Include D3.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.0/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
+<svg id="tree_svg"></svg>
+<script>
+        function getChildren(graph, selectedNodeId) {
+            const children = [];
+            graph.links.forEach(link => {
+            if (link.source.toString() === selectedNodeId.toString()) {
+                const targetNode = graph.nodes.find(node => node.id === link.target);
+                if (targetNode) {
+                    children.push(targetNode);
+                }
+            }
+            });
+            return children;
+        }
+
+        function buildGraph(graph, rootNodeId) {
+            const tree = {
+                id: rootNodeId.toString(),
+                uid : uuidv4(),
+                children: []
+            };
+            const children = getChildren(graph, rootNodeId);
+            tree.children = children.map(child => ({ ...child, uid: uuidv4(), children: [] }));
+
+            return tree;
+        }
+
+        const rootNodeId = "http://example.org/Person1";
+        data=buildGraph(graphCopy,rootNodeId);
+
+        function addChildrenToLeafNode(graph, node, targetNodeId, targetNodeUId) {
+            if (node.id.toString() === targetNodeId.toString() && node.uid.toString() === targetNodeUId.toString() && node.children.length === 0) {
+                const newChildren = getChildren(graph, targetNodeId);
+                node.children = newChildren.map(child => ({ ...child, uid: uuidv4(), children: [] }));
+                return true;
+            } else {
+                if(node.id.toString() === targetNodeId.toString() && node.uid.toString() === targetNodeUId.toString() && node.children.length > 0){
+                    node.children=[];
+                    return true;
+                }
+            }
+
+            for (const child of node.children) {
+                if (addChildrenToLeafNode(graph, child, targetNodeId, targetNodeUId)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Specify the charts’ dimensions. The height is variable, depending on the layout.
+        const width3 = 928;
+        const marginTop = 10;
+        const marginRight = 10;
+        const marginBottom = 10;
+        const marginLeft = 40;
+
+        // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
+        // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
+        // “bottom”, in the data domain. The width of a column is based on the tree’s height.
+        var root = d3.hierarchy(data);
+        const dx = 100;
+        const dy = 100;
+
+        // Define the tree layout and the shape for links.
+        const tree = d3.tree().nodeSize([dx, dy]);
+        const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+
+        var widthWindow = document.getElementById("tree").offsetWidth;
+        var heightWindow = document.getElementById("tree").offsetHeight;
+
+        // Create the SVG container, a layer for the links and a layer for the nodes.
+        const svg1 = d3.select("#tree_svg")
+            .attr("width", widthWindow)
+            .attr("height", heightWindow)
+            .attr("style", "max-width: 100%; height: 100%; font: 10px sans-serif; user-select: none;");
+
+        const zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", zoomed);
+        svg1.call(zoom);
+
+        const gLink = svg1.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "#555")
+            .attr("stroke-opacity", 0.4)
+            .attr("stroke-width", 3);
+
+        const gNode = svg1.append("g")
+            .attr("cursor", "pointer")
+            .attr("pointer-events", "all");
+
+        function update(event, source) {
+            const duration = event?.altKey ? 2500 : 250; // hold the alt key to slow down the transition
+            const nodes = root.descendants().reverse();
+            const links = root.links();
+
+            // Compute the new tree layout.
+            tree(root);
+
+            let left = root;
+            let right = root;
+            root.eachBefore(node => {
+                if (node.x < left.x) left = node;
+                if (node.x > right.x) right = node;
+            });
+
+            const height = 100;
+
+            const transition = svg1.transition()
+                .duration(duration)
+                .attr("height", height)
+                .attr("viewBox", [-marginLeft, left.x - marginTop, width3, height])
+                .tween("resize", window.ResizeObserver ? null : () => () => svg1.dispatch("toggle"));
+
+            // Update the nodes…
+            const node = gNode.selectAll("g")
+                .data(nodes, d => d.id);
+
+            // Enter any new nodes at the parent's previous position.
+            const nodeEnter = node.enter().append("g")
+                .attr("transform", d => `translate(${source.y0},${source.x0})`)
+                .attr("fill-opacity", 0)
+                .attr("stroke-opacity", 0)
+                .on("click", (event, d) => {
+                    addChildrenToLeafNode(graphCopy,data,d.data.id,d.data.uid);
+                    root=d3.hierarchy(data);
+                    d.children = d.children ? null : d._children;
+                    update(event,d);
+                });
+
+            nodeEnter.append("circle")
+                .attr("r", 20)
+                .attr("fill", "red")
+                .attr("stroke-width", 10);
+            
+            nodeEnter.append("text")
+                .attr("dy", "-1em")
+                .attr("x", d => d._children ? -16 : 16)
+                .attr("text-anchor", d => d._children ? "end" : "start")
+                .style("font-size", "40px")
+                .style("font-weight","bold")
+                .text(d => d.data.id)
+                .clone(true).lower()
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-width", 3)
+                .attr("stroke", "white");
+
+            // Transition nodes to their new position.
+            const nodeUpdate = node.merge(nodeEnter).transition(transition)
+                .attr("transform", d => `translate(${d.y},${d.x})`)
+                .attr("fill-opacity", 1)
+                .attr("stroke-opacity", 1);
+
+            // Transition exiting nodes to the parent's new position.
+            const nodeExit = node.exit().transition(transition).remove()
+                .attr("transform", d => `translate(${source.y},${source.x})`)
+                .attr("fill-opacity", 0)
+                .attr("stroke-opacity", 0);
+
+            // Update the links…
+            const link = gLink.selectAll("path")
+                .data(links, d => d.target.id);
+
+            // Enter any new links at the parent's previous position.
+            const linkEnter = link.enter().append("path")
+                .attr("d", d => {
+                    const o = {x: source.x0, y: source.y0};
+                    return diagonal({source: o, target: o});
+                });
+
+            // Transition links to their new position.
+            link.merge(linkEnter).transition(transition)
+                .attr("d", diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link.exit().transition(transition).remove()
+                .attr("d", d => {
+                    const o = {x: source.x, y: source.y};
+                    return diagonal({source: o, target: o});
+                });
+
+            // Stash the old positions for transition.
+            root.eachBefore(d => {
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        // Do the first update to the initial configuration of the tree — where a number of nodes
+        // are open (arbitrarily selected as the root, plus nodes with 7 letters).
+        root.x0 = dy / 2;
+        root.y0 = 0;
+        root.descendants().forEach((d, i) => {
+            d.id = d.data.id;
+            d._children = d.children;
+            if (d.depth && d.data.id.length !== 7)
+                { d.children = null; }
+        });
+
+        function zoomed(event) {
+            const { transform } = event;
+            const scaleFactor = 0.3; // Adjust this value to control the panning speed
+            const translatedX = transform.x * scaleFactor;
+            const translatedY = transform.y * scaleFactor;
+            const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
+            gNode.attr("transform", newTransform);
+            gLink.attr("transform", newTransform);
+        }
+        update(null, root);
+</script>
