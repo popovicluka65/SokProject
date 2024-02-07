@@ -77,6 +77,15 @@ def loadPlugins(pointName: str):
         plugins.append(plugin)
     return plugins
 
+def plugin_visualisators():
+    graphVisualisers = loadPlugins("graph.visualiser")
+    plugin_names = [type(plugin).__name__ for plugin in graphVisualisers]
+    return plugin_names
+
+def plugin_parsers():
+    graphVisualisers = loadPlugins("graph.parser")
+    plugin_names = [type(plugin).__name__ for plugin in graphVisualisers]
+    return plugin_names
 
 def main():
     graphParsers = loadPlugins("graph.parser")
@@ -96,18 +105,17 @@ def django():
     odabraniGraph = izabrana_opcija(graphParsers[1])
     add_graph_name(odabraniGraph)
     write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
-    afterSearch = search("person", "http://example.org/age", ">", 30)
-    write_graph_to_neo4j(URI, USERNAME, PASSWORD, afterSearch)
-    stringReprezentaicija = izabrana_opcija(graphVisualisers[1])
+    # afterSearch = search("person", "http://example.org/age", ">", 30)
+    # write_graph_to_neo4j(URI, USERNAME, PASSWORD, afterSearch)
+    stringReprezentaicija = izabrana_opcija(graphVisualisers[0])
     return odabraniGraph, stringReprezentaicija
 
 
 def write_graph_to_neo4j(uri, username, password, graph):
-    db.cypher_query("MATCH (n) DETACH DELETE n")
     def create_node(tx, node):
         node_attributes = {}
         node_attributes["id"] = node.id
-        node_attributes["graph_name"] = node.graph_name
+        #node_attributes["graph_name"] = node.graph_name
         for attribute in node.value:
             node_attributes[attribute] = node.value[attribute]
         tx.run("CREATE (:Node $attributes)", attributes=node_attributes)
@@ -122,8 +130,9 @@ def write_graph_to_neo4j(uri, username, password, graph):
             for node, _ in graph.indices:
                 session.write_transaction(create_node, node)
 
+            print(len(graph.edges))
             for edge in graph.edges:
-                session.write_transaction(create_edge, edge)
+                 session.write_transaction(create_edge, edge)
 
 
 def retrieve_graph(tx):
@@ -249,6 +258,7 @@ def search_nodes(tx, search_query):
 def search(search_query, attribute, operator, value):
     print("UDJE U SEARCH")
 
+    #zbog provere zakomentarisano
     driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
 
     with driver.session() as session:

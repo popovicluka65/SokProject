@@ -24,9 +24,24 @@
   var width1 = document.getElementById("main").offsetWidth;
   var height1 = document.getElementById("main").offsetHeight;
 
+
   svg.attr("width", width1).attr("height", height1);
   var width = svg.attr("width");
   var height = svg.attr("height");
+
+  function zoomed_main(event) {
+    const { transform } = d3.event;
+    const scaleFactor = 0.3; // Adjust this value to control the panning speed
+    const translatedX = transform.x * scaleFactor;
+    const translatedY = transform.y * scaleFactor;
+    const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
+    svg.selectAll("*").attr("transform",newTransform);
+    }
+  const zoom_main = d3.zoom()
+   .scaleExtent([0.1, 10])
+    .on("zoom", zoomed_main);
+    svg.call(zoom_main);
+
   var graph = {
     nodes: [
       {% for point in points %}
@@ -39,6 +54,8 @@
       {% endfor %}
     ]
   };
+
+  var rootNodeId  = graph.nodes[0].id;
   var graphCopy=JSON.parse(JSON.stringify(graph));;
 
   var simulation = d3
@@ -159,4 +176,26 @@
     d.fx = null;
     d.fy = null;
   }
+
+  var node = svg
+    .append("g")
+    .attr("class", "nodes")
+    .selectAll("circle")
+    .data(graph.nodes)
+    .enter()
+    .append("circle")
+    .attr("r", 10)
+    .on("click", function(d) {
+        // Prikazujemo ID čvora kada se klikne na njega
+        console.log("ID ID ID")
+        console.log(d.id);
+        alert("ID čvora: " + d.id);
+        rootNodeId = d.id;
+    })
+    .call(
+        d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+    );
 </script>
