@@ -7,51 +7,10 @@
 <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
 <svg id="tree_svg"></svg>
 <script>
-        var graph3 = {
-    nodes: [
-      
-        {id: 1},
-      
-        {id: 2},
-      
-        {id: 3},
-      
-        {id: 22},
-      
-        {id: 5},
-      
-        {id: 6},
-      
-        {id: 7},
-      
-    ],
-    links: [
-    
-        {source: 1, target: 2 },
-      
-        {source: 1, target: 5 },
-      
-        {source: 2, target: 3 },
-
-        {source: 3, target: 2 },
-      
-        {source: 2, target: 22 },
-      
-        {source: 3, target: 7 },
-      
-        {source: 3, target: 22 },
-      
-        {source: 5, target: 2 },
-      
-        {source: 22, target: 3 }
-      
-    ]
-  };
-
         function getChildren(graph, selectedNodeId) {
             const children = [];
             graph.links.forEach(link => {
-            if (link.source === selectedNodeId.toString()) {
+            if (link.source.toString() === selectedNodeId.toString()) {
                 const targetNode = graph.nodes.find(node => node.id === link.target);
                 if (targetNode) {
                     children.push(targetNode);
@@ -73,7 +32,7 @@
             return tree;
         }
 
-        const rootNodeId = 2;
+        const rootNodeId = "http://example.org/Person1";
         data=buildGraph(graphCopy,rootNodeId);
 
         function addChildrenToLeafNode(graph, node, targetNodeId, targetNodeUId) {
@@ -123,6 +82,11 @@
             .attr("width", widthWindow)
             .attr("height", heightWindow)
             .attr("style", "max-width: 100%; height: 100%; font: 10px sans-serif; user-select: none;");
+
+        const zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", zoomed);
+        svg1.call(zoom);
 
         const gLink = svg1.append("g")
             .attr("fill", "none")
@@ -174,7 +138,7 @@
                 });
 
             nodeEnter.append("circle")
-                .attr("r", 30)
+                .attr("r", 20)
                 .attr("fill", "red")
                 .attr("stroke-width", 10);
             
@@ -242,5 +206,14 @@
                 { d.children = null; }
         });
 
+        function zoomed(event) {
+            const { transform } = event;
+            const scaleFactor = 0.3; // Adjust this value to control the panning speed
+            const translatedX = transform.x * scaleFactor;
+            const translatedY = transform.y * scaleFactor;
+            const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
+            gNode.attr("transform", newTransform);
+            gLink.attr("transform", newTransform);
+        }
         update(null, root);
 </script>
