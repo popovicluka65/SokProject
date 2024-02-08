@@ -55,8 +55,8 @@ def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwarg
     try:
         if isinstance(plugin, GraphParserBase):
             # graf = plugin.load(kwargs["file"])
-            #graf = plugin.load("example1.ttl")
-            graf = plugin.load("example1.json")
+            graf = plugin.load("example1.ttl")
+            #graf = plugin.load("example1.json")
             globalni_niz.append(graf)
             return graf
         if isinstance(plugin, GraphVisualiserBase):
@@ -103,8 +103,8 @@ def django():
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
     delete_all_graphs()
-    odabraniGraph = izabrana_opcija(graphParsers[0])
-    odabraniGraph1 = izabrana_opcija(graphParsers[0])
+    odabraniGraph = izabrana_opcija(graphParsers[1])
+    odabraniGraph1 = izabrana_opcija(graphParsers[1])
     add_graph_name(odabraniGraph)
     add_graph_name(odabraniGraph1)
     write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
@@ -150,10 +150,16 @@ def write_graph_to_neo4j(uri, username, password, graph):
         tx.run("CREATE (:Node $attributes)", attributes=node_attributes)
 
     def create_edge(tx, edge):
-        tx.run("MATCH (a:Node {id: $id1}), (b:Node {id: $id2}) "
-               "CREATE (a)-[:CONNECTED_TO {value: $value}]->(b)",
-               id1=edge.firstNode.id, id2=edge.secondNode.id, value=edge.value)
-
+        tx.run(
+            "MATCH (a:Node {id: $id1, graph_name: $graph_name1}), (b:Node {id: $id2, graph_name: $graph_name2}) "
+            "WHERE $graph_name1 = $graph_name2 "
+            "CREATE (a)-[:CONNECTED_TO {value: $value}]->(b)",
+            id1=edge.firstNode.id,
+            id2=edge.secondNode.id,
+            value=edge.value,
+            graph_name1=edge.firstNode.graph_name,
+            graph_name2=edge.secondNode.graph_name
+        )
     with GraphDatabase.driver(uri, auth=(username, password)) as driver:
         with driver.session() as session:
             for node, _ in graph.indices:
@@ -245,12 +251,13 @@ def search_nodes(tx, search_query, graph_name):         #ne brisu se grane nesto
        MATCH (n)
        WHERE
        n.graph_name = $graph_name AND
-       ANY(key IN keys(n) WHERE n[key] CONTAINS $search_query AND key CONTAINS $search_query)
+       ANY(key IN keys(n) WHERE n[key] CONTAINS $search_query OR key CONTAINS $search_query)
        RETURN n
         """,
         search_query=search_query,
         graph_name=graph_name
     )
+    cvorovi=[]
     for record in result1:
         newNodeDB = record["n"]
         attributes = dict(newNodeDB.items())
@@ -266,6 +273,40 @@ def search_nodes(tx, search_query, graph_name):         #ne brisu se grane nesto
                 break
         if not is_node_in_graph:
             newGraph.addNode(newNode)
+            cvorovi.append(newNode)
+    par=[]
+    for record in result:
+        edge = record["r"]
+        node1 = record["n"]
+        node2 = record["m"]
+        attributes_n = dict(node1.items())
+        attributes_m = dict(node2.items())
+        id_n = attributes_n["id"]
+        id_m = attributes_m["id"]
+        del attributes_n["id"]
+        del attributes_m["id"]
+        newNode1 = Node(id_n, attributes_n,graph_name)
+        newNode2 = Node(id_m, attributes_m,graph_name)
+        if(edge):
+            par.append([newNode1,newNode2])
+    print("PAR")
+    print(len(par))
+    grane=[]
+    brojac=0
+    for node1,node2 in par:
+        counter=0
+        print(node1.id)
+        for a in cvorovi:
+            print("ATRIBUT A")
+            print(a.id)
+            if (node1.id==a.id or node2.id==a.id):
+                counter=counter+1
+        if counter==2:
+            brojac=brojac+1
+            grane.append([node1,node2])
+    print("BROJAC")
+    print(brojac)
+    print(grane)
     # for record in result:
     #     edge = record["r"]
     #     node1 = record["n"]
@@ -313,8 +354,6 @@ def search(search_query, attribute, operator, value, graph_name):
         resultFilter = session.read_transaction(filter_nodes, attribute, operator, value, graph_name)
         delete_graph(graph_name)
         write_graph_to_neo4j(URI, USERNAME, PASSWORD, resultFilter)
-        print("POSLE SEARCHA i Filtera")
-        print(resultFilter)
         return resultFilter
 
 
