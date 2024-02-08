@@ -55,8 +55,10 @@ def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwarg
     try:
         if isinstance(plugin, GraphParserBase):
             # graf = plugin.load(kwargs["file"])
-            graf = plugin.load("example1.ttl")
-            #graf = plugin.load("example1.json")
+            if (type(plugin).__name__ == "GraphParserRDF"):
+                graf = plugin.load("example1.ttl")
+            else:
+                graf = plugin.load("example1.json")
             globalni_niz.append(graf)
             return graf
         if isinstance(plugin, GraphVisualiserBase):
@@ -99,19 +101,19 @@ def add_graph_name(graph: Graph):
     for node, position in graph.indices:
         node.graph_name =graph_name
 
-def django():
+def django(parser,visualiser):
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
     delete_all_graphs()
-    odabraniGraph = izabrana_opcija(graphParsers[1])
-    odabraniGraph1 = izabrana_opcija(graphParsers[1])
+    odabraniGraph = izabrana_opcija(graphParsers[parser])
+    # odabraniGraph1 = izabrana_opcija(graphParsers[parser])
     add_graph_name(odabraniGraph)
-    add_graph_name(odabraniGraph1)
+    # add_graph_name(odabraniGraph1)
     write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
-    write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph1)
-    graph_filtered = search("Person", "http://example.org/age", ">", 30, odabraniGraph.indices[0][0].graph_name)
-    stringReprezentaicija = izabrana_opcija(graphVisualisers[1])
-    return graph_filtered, stringReprezentaicija
+    # write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph1)
+    # graph_filtered = search("Person", "http://example.org/age", ">", 30, odabraniGraph.indices[0][0].graph_name)
+    stringReprezentaicija = izabrana_opcija(graphVisualisers[visualiser])
+    return odabraniGraph, stringReprezentaicija
 
 def delete_all_graphs():
     db.cypher_query("MATCH (n) DETACH DELETE n")
@@ -165,7 +167,7 @@ def write_graph_to_neo4j(uri, username, password, graph):
             for node, _ in graph.indices:
                 session.write_transaction(create_node, node)
 
-            print(len(graph.edges))
+            #print(len(graph.edges))
             for edge in graph.edges:
                  session.write_transaction(create_edge, edge)
 
@@ -289,24 +291,34 @@ def search_nodes(tx, search_query, graph_name):         #ne brisu se grane nesto
         newNode2 = Node(id_m, attributes_m,graph_name)
         if(edge):
             par.append([newNode1,newNode2])
-    print("PAR")
-    print(len(par))
+    #print("PAR")
+    #print(len(par))
     grane=[]
     brojac=0
     for node1,node2 in par:
         counter=0
-        print(node1.id)
+        #print(node1.id)
         for a in cvorovi:
-            print("ATRIBUT A")
-            print(a.id)
+            #print("ATRIBUT A")
+            #print(a.id)
             if (node1.id==a.id or node2.id==a.id):
                 counter=counter+1
         if counter==2:
             brojac=brojac+1
             grane.append([node1,node2])
-    print("BROJAC")
-    print(brojac)
-    print(grane)
+    # print("BROJAC")
+    # print(brojac)
+    # print(grane)
+    # print(len(grane))
+    for firstNode, secondNode in grane:
+        #print("GRANEEEEEEEEE")
+        e:Edge=Edge(firstNode,secondNode)
+        #print(e)
+        newGraph.addEdge(e)
+    # print("BROJ GRANA U GRAFU")
+    # print(len(newGraph.edges))
+    # for cvorovi in newGraph.indices:
+    #     print(cvorovi[0].graph_name)
     # for record in result:
     #     edge = record["r"]
     #     node1 = record["n"]

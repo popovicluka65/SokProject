@@ -21,18 +21,18 @@
     var width = svg.attr("width");
     var height = svg.attr("height");
 
-    function zoomed_main(event) {
-    const { transform } = d3.event;
-    const scaleFactor = 0.3; // Adjust this value to control the panning speed
-    const translatedX = transform.x * scaleFactor;
-    const translatedY = transform.y * scaleFactor;
-    const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
-    svg.selectAll("*").attr("transform",newTransform);
-    }
-  const zoom_main = d3.zoom()
-   .scaleExtent([0.1, 10])
-    .on("zoom", zoomed_main);
-    svg.call(zoom_main);
+  //   function zoomed_main_block(event) {
+  //   const { transform } = d3.event;
+  //   const scaleFactor = 0.3; // Adjust this value to control the panning speed
+  //   const translatedX = transform.x * scaleFactor;
+  //   const translatedY = transform.y * scaleFactor;
+  //   const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
+  //   svg.selectAll("*").attr("transform",newTransform);
+  //   }
+  // const zoom_main_block = d3.zoom()
+  //  .scaleExtent([0.1, 10])
+  //   .on("zoom", zoomed_main_block);
+  //   svg.call(zoom_main_block);
 
     var graph = {
         nodes: [

@@ -28,11 +28,12 @@
 
     }
 
+    let isLoaded = false;
     window.onload = () => {
         const target = d3.select("#main_svg").node();
         const options = { subtree: true, attributes: true };
         const observer = new MutationObserver( () => {
-            loadBirdView();
+                loadBirdView();
         });
         observer.observe(target, options);
         }
