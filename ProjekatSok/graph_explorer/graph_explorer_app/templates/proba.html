@@ -105,7 +105,6 @@
             var parsers = {{ pluginsParsers|safe }};
             var workspaces = {{ unique_names|safe }};
 
-            // Funkcija za punjenje combobox-a sa opcijama
             function populateVisualisersCombo(visualisers) {
                 var select = $('#select-visualiser');
                 select.empty();
@@ -132,53 +131,57 @@
                 });
             }
 
-            function applyButton(selectedVisualiser,selectedParser,searchValue,filterValue) {
+            function addWorkspace(selectedVisualiser,selectedParser) {
                 const request = new XMLHttpRequest();
 
                 request.onreadystatechange = function () {
                     if (request.readyState === 4 && request.status === 200) {
                         var graph=request.responseText;
                         $('#main_svg').html(graph);
-                        //location.reload();
-                }
+                        populateWorkspaceCombo(unique_names);
+                    }
                 };
-                request.open("GET", "search/" + encodeURIComponent(selectedVisualiser)+"/"+encodeURIComponent(selectedParser), true);
+
+                request.open("GET", "workspace/" + encodeURIComponent(selectedVisualiser)+"/"+encodeURIComponent(selectedParser), true);
                 request.send();
             }
+
+
+            function applyButton(searchValue,filterValue,selectedWorkspace) {
+                const request = new XMLHttpRequest();
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+
+                }
+                };
+                request.open("GET", "search/" + encodeURIComponent(searchValue)+"/"+encodeURIComponent(filterValue) + "/"+encodeURIComponent(selectedWorkspace), true);
+                request.send();
+            }
+
             populateVisualisersCombo(visualisers);
             populateParsersCombo(parsers);
             populateWorkspaceCombo(workspaces);
 
-             $('#apply-button').click(function(){
-            var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
-            var selectedParser = document.getElementById('select-parser').selectedIndex;
+            $('#apply-button').click(function(){
 
+                var searchValue = $('input[placeholder="Search"]').val();
+                var filterValue = $('input[placeholder="Filter"]').val();
+                var selectedWorkspace = document.getElementById('workspace').value;
+                console.log(selectedWorkspace);
+                applyButton(searchValue,filterValue,selectedWorkspace);
 
-            var searchValue = $('input[placeholder="Search"]').val();
-            var filterValue = $('input[placeholder="Filter"]').val();
-            applyButton(selectedVisualiser,selectedParser,searchValue,filterValue);
-            applyButton(selectedVisualiser,selectedParser,searchValue,filterValue);
+            });
 
+            $('#add-workspace').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedParser = document.getElementById('select-parser').selectedIndex;
+                addWorkspace(selectedVisualiser,selectedParser);
+                addWorkspace(selectedVisualiser,selectedParser);
+            });
         });
-
-        $('#add-workspace').click(function(){
-            console.log("ADD WORKSPACE")
-
-        });
-        });
-        function zoomed_main(event) {
-        const { transform } = d3.event;
-        const scaleFactor = 0.3; // Adjust this value to control the panning speed
-        const translatedX = transform.x * scaleFactor;
-        const translatedY = transform.y * scaleFactor;
-        const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
-        svg.selectAll("*").attr("transform",newTransform);
-        }
-
-        const zoom_main = d3.zoom()
-        .scaleExtent([0.1, 10])
-        .on("zoom", zoomed_main);
-        svg.call(zoom_main);
 
     </script>
     <link rel="icon" href="data:,"> {# Here #}

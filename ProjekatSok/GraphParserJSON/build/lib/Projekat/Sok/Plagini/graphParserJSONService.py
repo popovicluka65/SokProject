@@ -79,8 +79,15 @@ class CyklicGraph(GraphHandler):
                         new_att[att] = node.value[att]
                 node.value = new_att
                 for nodeE in node.edges:
-                    nodeFull = self.findNodeByDict(g, nodeE)
-                    if nodeFull is not None:
+                    nodeFull=self.findNodeByDict(g,nodeE)
+                    if nodeFull is None:
+                        if connection in nodeE:
+                            del nodeE[connection]
+                            nodeFull = self.findNodeByDict(g, nodeE)
+                            if nodeFull is not None:
+                                e=Edge(node,nodeFull)
+                                g.addEdge(e)
+                    else:
                         e = Edge(node, nodeFull)
                         g.addEdge(e)
 
