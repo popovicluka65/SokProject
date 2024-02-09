@@ -1,5 +1,6 @@
 from typing import List, Union
-
+import uuid
+from Projekat.Sok.Osnova.Model.graph import Graph as Graph, Node, Edge
 import pkg_resources
 from neo4j import GraphDatabase
 import json
@@ -16,169 +17,9 @@ URI = "bolt://localhost:7687"
 USERNAME = "neo4j"
 PASSWORD = "password"
 
-html_string = """
-<!DOCTYPE html>
-<meta charset="utf-8" />
-<style>
-  .links line {
-    stroke: #999;
-    stroke-opacity: 0.6;
-  }
-
-  .nodes circle {
-    stroke: #fff;
-    stroke-width: 1.5px;
-    fill: red;
-  }
-
-  .labels text {
-    font-size: 20px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-    fill: black;
-  }
-</style>
-
-<svg width="1800" height="800"></svg>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-
-<script>
-  var svg = d3.select("svg");
-  var width = svg.attr("width");
-  var height = svg.attr("height");
-
-  var graph = {
-    nodes: [
-
-        {id: "1"},
-
-        {id: "2"},
-
-        {id: "3"},
-
-    ],
-    links: [
-
-        {source: "1", target: "2" },
-
-        {source: "1", target: "3" },
-
-        {source: "2", target: "1" },
-
-        {source: "3", target: "1" },
-
-    ]
-  };
-
-  var simulation = d3
-  .forceSimulation(graph.nodes)
-  .force(
-    "link",
-    d3
-      .forceLink()
-      .id(function(d) {
-        return d.id;
-      })
-      .links(graph.links).distance(100)
-  )
-  .force("charge", d3.forceManyBody().strength(-30))
-  .force("center", d3.forceCenter(width / 2, height / 2))
-  .on("tick", ticked);
-
-  var text = svg
-    .append("g")
-    .attr("class", "labels")
-    .selectAll("text")
-    .data(graph.nodes)
-    .enter()
-    .append("text")
-    .text(function(d) {
-      return d.id;
-    })
-    .attr("dx", 12) 
-    .attr("dy", ".35em")
-
-   var link = svg
-  .append("g")
-  .attr("class", "links")
-  .selectAll("line")
-  .data(graph.links)
-  .enter()
-  .append("line")
-  .attr("stroke-width", function(d) {
-    return 3;
-  })
-
-  var node = svg
-    .append("g")
-    .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes)
-    .enter()
-    .append("circle")
-    .attr("r", 10)
-    .call(
-      d3
-        .drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended)
-    );
-
-  function ticked() {
-    link
-    .attr("x1", function(d) {
-      return d.source.x;
-    })
-    .attr("y1", function(d) {
-      return d.source.y;
-    })
-    .attr("x2", function(d) {
-      return d.target.x;
-    })
-    .attr("y2", function(d) {
-      return d.target.y;
-    });
-
-  node
-    .attr("cx", function(d) {
-      return d.x;
-    })
-    .attr("cy", function(d) {
-      return d.y;
-    });
-
-  text
-    .attr("x", function(d) {
-      return d.x;
-    })
-    .attr("y", function(d) {
-      return d.y;
-    });
-}
-
-  function dragstarted(d) {
-    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-  }
-
-  function dragged(d) {
-    d.fx = d3.event.x;
-    d.fy = d3.event.y;
-  }
-
-  function dragended(d) {
-    if (!d3.event.active) simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
-  }
-</script>
-"""
-
 
 def consoleMenu(*args, **kwargs):
-    plugins: List[Union] = kwargs.get("graphParsers", []) + kwargs.get("graphVisualisers", []) # ovde treba da ide typing Union[GraphParserBase, GraphVisualiserBase] ali za sad ne
+    plugins: List[Union] = kwargs.get("graphParsers", []) + kwargs.get("graphVisualisers",[])  # ovde treba da ide typing Union[GraphParserBase, GraphVisualiserBase] ali za sad ne
     if not plugins:
         print("Nije prepoznati nijedan plugin!")
         return
@@ -208,22 +49,25 @@ def consoleMenu(*args, **kwargs):
             error = True
     return ""
 
+
 def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwargs):
     global globalni_niz
     try:
         if isinstance(plugin, GraphParserBase):
-            #graf = plugin.load(kwargs["file"])
-            graf = plugin.load("example1.ttl")
-            #graf = plugin.load("example1.json")
+            # graf = plugin.load(kwargs["file"])
+            if (type(plugin).__name__ == "GraphParserRDF"):
+                graf = plugin.load("example1.ttl")
+            else:
+                graf = plugin.load("example1.json")
             globalni_niz.append(graf)
             return graf
         if isinstance(plugin, GraphVisualiserBase):
-            #plugin.visualize(globalni_niz[-1])
-            #return plugin.visualize(globalni_niz[-1])
-            return html_string
+            return plugin.visualize(globalni_niz[-1])
     except Exception as e:
         print(f"Error: {e}")
     return "Radi"
+
+
 def loadPlugins(pointName: str):
     plugins = []
     for ep in pkg_resources.iter_entry_points(group=pointName):
@@ -233,6 +77,17 @@ def loadPlugins(pointName: str):
         plugins.append(plugin)
     return plugins
 
+
+def plugin_visualisators():
+    graphVisualisers = loadPlugins("graph.visualiser")
+    plugin_names = [type(plugin).__name__ for plugin in graphVisualisers]
+    return plugin_names
+
+def plugin_parsers():
+    graphVisualisers = loadPlugins("graph.parser")
+    plugin_names = [type(plugin).__name__ for plugin in graphVisualisers]
+    return plugin_names
+
 def main():
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
@@ -241,55 +96,317 @@ def main():
                 graphVisualisers=graphVisualisers,
                 file="example1.json")
 
-def django():
+def add_graph_name(graph: Graph):
+    graph_name=""+str(uuid.uuid4())
+    for node, position in graph.indices:
+        node.graph_name =graph_name
+
+def initialization(parser,visualiser):
+    delete_all_graphs()
+    odabraniGraph, stringReprezentaicija = add_workspace(parser, visualiser)
+    return odabraniGraph, stringReprezentaicija
+
+def add_workspace(parser,visualiser):
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
-    odabraniGraph = izabrana_opcija(graphParsers[0])
-    write_graph_to_neo4j(URI,USERNAME,PASSWORD,odabraniGraph)
-    stringReprezentaicija = izabrana_opcija(graphVisualisers[0])
-    return odabraniGraph,stringReprezentaicija
+    odabraniGraph = izabrana_opcija(graphParsers[parser])
+    print(graphVisualisers)
+    print(graphParsers)
+    add_graph_name(odabraniGraph)
+    write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
+    html = izabrana_opcija(graphVisualisers[visualiser])
+    print("HTML")
+    print(html)
+    return odabraniGraph, html
+
+def delete_all_graphs():
+    db.cypher_query("MATCH (n) DETACH DELETE n")
+
+def delete_graph(graph_name):
+    query = "MATCH (n {graph_name: $graphName}) DETACH DELETE n"
+    params = {"graphName": graph_name}
+    db.cypher_query(query, params)
+
+def get_edges(graph_name):
+    query = """
+        MATCH (n)-[r]->(m)
+        WHERE n.graph_name = $graph_name AND m.graph_name = $graph_name
+        RETURN n, r, m
+    """
+    params = {"graph_name": graph_name}
+    return db.cypher_query(query, params)
+
+def get_unique_graph_names():
+    query = "MATCH (n) WHERE n.graph_name IS NOT NULL RETURN DISTINCT n.graph_name AS UniqueGraphNames"
+    results, _ = db.cypher_query(query)
+    if results:
+        unique_graph_names = [record[0] for record in results]
+        return unique_graph_names
+    else:
+        return []
+
 
 def write_graph_to_neo4j(uri, username, password, graph):
-
-    db.cypher_query("MATCH (n) DETACH DELETE n")
     def create_node(tx, node):
-        value_json = json.dumps(node.value)
-        tx.run("CREATE (:Node {id: $id, properties: $value})", id=node.id, value=value_json)
+        node_attributes = {}
+        node_attributes["id"] = node.id
+        node_attributes["graph_name"] = node.graph_name
+        for attribute in node.value:
+            node_attributes[attribute] = node.value[attribute]
+        tx.run("CREATE (:Node $attributes)", attributes=node_attributes)
 
     def create_edge(tx, edge):
-        tx.run("MATCH (a:Node {id: $id1}), (b:Node {id: $id2}) "
-               "CREATE (a)-[:CONNECTED_TO {value: $value}]->(b)",
-               id1=edge.firstNode.id, id2=edge.secondNode.id, value=edge.value)
-
+        tx.run(
+            "MATCH (a:Node {id: $id1, graph_name: $graph_name1}), (b:Node {id: $id2, graph_name: $graph_name2}) "
+            "WHERE $graph_name1 = $graph_name2 "
+            "CREATE (a)-[:CONNECTED_TO {value: $value}]->(b)",
+            id1=edge.firstNode.id,
+            id2=edge.secondNode.id,
+            value=edge.value,
+            graph_name1=edge.firstNode.graph_name,
+            graph_name2=edge.secondNode.graph_name
+        )
     with GraphDatabase.driver(uri, auth=(username, password)) as driver:
         with driver.session() as session:
             for node, _ in graph.indices:
                 session.write_transaction(create_node, node)
 
+            #print(len(graph.edges))
             for edge in graph.edges:
-                session.write_transaction(create_edge, edge)
+                 session.write_transaction(create_edge, edge)
+
+
 def retrieve_graph(tx):
-    result = tx.run("MATCH (n) OPTIONAL MATCH (n)-[r]-(m) RETURN COLLECT(DISTINCT n) AS nodes, COLLECT(DISTINCT r) AS relationships")
+    result = tx.run(
+        "MATCH (n) OPTIONAL MATCH (n)-[r]-(m) RETURN COLLECT(DISTINCT n) AS nodes, COLLECT(DISTINCT r) AS relationships")
     return result.data()
 
-def search_nodes(tx, search_query):
+
+def filter_nodes(tx, f_attribute, f_operator, f_value, graph_name):     #fali query za grane
+    newGraph = Graph()
+    query = ("""
+     MATCH (n)
+    WHERE
+      (n.graph_name = $graph_name) AND
+      (n[$attribute] IS NOT NULL) AND 
+      CASE 
+        WHEN $operator = '=' THEN n[$attribute] = $value 
+        WHEN $operator = '!=' THEN n[$attribute] <> $value 
+        WHEN $operator = '>' THEN n[$attribute] > $value 
+        WHEN $operator = '<' THEN n[$attribute] < $value 
+        ELSE FALSE 
+      END 
+    RETURN n""")
+    result = tx.run(query, attribute=f_attribute, operator=f_operator, value=f_value, graph_name=graph_name)
+    for record in result:
+        newNodeDB = record["n"]
+        attributes = dict(newNodeDB.items())
+        id = attributes["id"]
+        del attributes["id"]
+        newNode = Node(id, attributes)
+        is_node_in_graph = False
+        for indice in newGraph.indices:
+            node = indice[0]
+            if node.id == newNode.id:
+                is_node_in_graph = True
+                break
+        if not is_node_in_graph:
+            newGraph.addNode(newNode)
+    added_edges = []
+    for record in result:
+        edge = record["r"]
+        node1 = record["n"]
+        node2 = record["m"]
+        newNode1 = Node(node1.get("id"), json.loads(node1.get("value")))
+        newNode2 = Node(node2.get("id"), json.loads(node2.get("value")))
+        # print("Node1: ", newNode1, " Node2: ", newNode2, " Edge: ", newEdge, '\n')
+        is_node_in_graph = False
+        for indice in newGraph.indices:
+            node = indice[0]
+            if node.id == newNode1.id:
+                is_node_in_graph = True
+                break
+        if not is_node_in_graph:
+            newGraph.addNode(newNode1)
+        if edge is not None and (str(newNode2.id) + str(newNode1.id)) not in added_edges:
+            newEdge = Edge(newNode1, newNode2)
+            newNode1.edges.append(newNode2)
+            newGraph.addEdge(newEdge)
+            added_edges.append(str(newNode1.id) + str(newNode2.id))
+
+    return newGraph
+
+def findNodeByDict(g,nodeDict):
+        for node,possition in g.indices:
+            if node.value==nodeDict:
+                return node
+
+def search_nodes(tx, search_query, graph_name):         #ne brisu se grane nesto
+    newGraph = Graph()
     result = tx.run(
-        "MATCH (n) WHERE any(key in keys(n) where n[key] CONTAINS $search_query OR any(property in properties(n) where property CONTAINS $search_query)) RETURN n",
-        search_query=search_query
+        """
+        MATCH (n)-[r]-(m)
+        WHERE
+          (n.graph_name = $graph_name AND m.graph_name = $graph_name) AND
+          ANY(key IN keys(n) WHERE n[key] CONTAINS $search_query OR key CONTAINS $search_query) AND
+          ANY(key IN keys(m) WHERE m[key] CONTAINS $search_query OR key CONTAINS $search_query)
+        RETURN n, r, m
+        """,
+        search_query=search_query,
+        graph_name=graph_name
     )
-    return [record["n"] for record in result]
-def search(search_query,filter_query):
-    print("UDJE U SEARCH")
+    result1 = tx.run(
+        """
+       MATCH (n)
+       WHERE
+       n.graph_name = $graph_name AND
+       ANY(key IN keys(n) WHERE n[key] CONTAINS $search_query OR key CONTAINS $search_query)
+       RETURN n
+        """,
+        search_query=search_query,
+        graph_name=graph_name
+    )
+    cvorovi=[]
+    for record in result1:
+        newNodeDB = record["n"]
+        attributes = dict(newNodeDB.items())
+        id = attributes["id"]
+        del attributes["id"]
+        attributes["graph_name"]=graph_name
+        newNode = Node(id, attributes,graph_name)
+        is_node_in_graph = False
+        for indice in newGraph.indices:
+            node = indice[0]
+            if node.id == newNode.id:
+                is_node_in_graph = True
+                break
+        if not is_node_in_graph:
+            newGraph.addNode(newNode)
+            cvorovi.append(newNode)
+    added_edges = []
+    for record in result:
+        edge = record["r"]
+        node1 = record["n"]
+        node2 = record["m"]
+        #print("")
+        #print("edge: ", edge, "\n node1:", node1,"'\n node2", node2)
+        attributes_n = dict(node1.items())
+        attributes_m = dict(node2.items())
+        id_n = attributes_n["id"]
+        id_m = attributes_m["id"]
+        del attributes_n["id"]
+        del attributes_m["id"]
+        newNode1 = Node(id_n, attributes_n,graph_name)
+        newNode2 = Node(id_m, attributes_m,graph_name)
+        is_node_in_graph = False
+        for indice in newGraph.indices:
+            node = indice[0]
+            if node.id == newNode1.id:
+                is_node_in_graph = True
+                break
+        if not is_node_in_graph:
+            newGraph.addNode(newNode1)
+
+        if edge is not None and (str(newNode2.id) + str(newNode1.id)) not in added_edges:
+             newEdge = Edge(newNode1, newNode2)
+             newNode1.edges.append(newNode2)
+             newGraph.addEdge(newEdge)
+             added_edges.append(str(newNode1.id) + str(newNode2.id))
+    return newGraph
+
+
+def search(search_query, attribute, operator, value, graph_name):
 
     driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
-
+    graphVisualisers = loadPlugins("graph.visualiser")
     with driver.session() as session:
-        result = session.read_transaction(search_nodes, search_query)
+        if(search_query!=""):
+            resultSearch = session.read_transaction(search_nodes, search_query, graph_name)
+            delete_graph(graph_name)
+            write_graph_to_neo4j(URI, USERNAME, PASSWORD, resultSearch)
+        resultFilter = session.read_transaction(filter_nodes, attribute, operator, value, graph_name)
+        delete_graph(graph_name)
+        write_graph_to_neo4j(URI, USERNAME, PASSWORD, resultFilter)
 
-        #return result
+        # for node, position in resultFilter.indices:
+        #     if graph_name in node.value:
+        #         del node.value[graph_name]
 
+        globalni_niz.append(resultFilter)
 
-        #moramo konvertovati u nas pravi graph
+        stringHTML =  izabrana_opcija(graphVisualisers[0])
+        print(stringHTML)
+        return resultFilter,stringHTML
+
+def get_graph_by_name(graph_name):
+    driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
+    with driver.session() as session:
+        resultSearch = session.read_transaction(get_graph_by_name_query, graph_name)
+    return resultSearch
+def get_graph_by_name_query(tx, graph_name):
+    newGraph = Graph()
+    result = tx.run(
+        """
+        MATCH (n)-[r]-(m)
+        WHERE
+          (n.graph_name = $graph_name AND m.graph_name = $graph_name)
+        RETURN n, r, m
+        """,
+        graph_name=graph_name
+    )
+    result1 = tx.run(
+        """
+       MATCH (n)
+       WHERE
+       n.graph_name = $graph_name
+       RETURN n
+        """,
+        graph_name=graph_name
+    )
+    cvorovi=[]
+    for record in result1:
+        newNodeDB = record["n"]
+        attributes = dict(newNodeDB.items())
+        id = attributes["id"]
+        del attributes["id"]
+        attributes["graph_name"]=graph_name
+        newNode = Node(id, attributes,graph_name)
+        is_node_in_graph = False
+        for indice in newGraph.indices:
+            node = indice[0]
+            if node.id == newNode.id:
+                is_node_in_graph = True
+                break
+        if not is_node_in_graph:
+            newGraph.addNode(newNode)
+            cvorovi.append(newNode)
+    added_edges = []
+    for record in result:
+        edge = record["r"]
+        node1 = record["n"]
+        node2 = record["m"]
+        attributes_n = dict(node1.items())
+        attributes_m = dict(node2.items())
+        id_n = attributes_n["id"]
+        id_m = attributes_m["id"]
+        del attributes_n["id"]
+        del attributes_m["id"]
+        newNode1 = Node(id_n, attributes_n,graph_name)
+        newNode2 = Node(id_m, attributes_m,graph_name)
+        is_node_in_graph = False
+        for indice in newGraph.indices:
+            node = indice[0]
+            if node.id == newNode1.id:
+                is_node_in_graph = True
+                break
+        if not is_node_in_graph:
+            newGraph.addNode(newNode1)
+        if edge is not None and (str(newNode2.id) + str(newNode1.id)) not in added_edges:
+             newEdge = Edge(newNode1, newNode2)
+             newNode1.edges.append(newNode2)
+             newGraph.addEdge(newEdge)
+             added_edges.append(str(newNode1.id) + str(newNode2.id))
+    return newGraph
 
 
 if __name__ == "__main__":

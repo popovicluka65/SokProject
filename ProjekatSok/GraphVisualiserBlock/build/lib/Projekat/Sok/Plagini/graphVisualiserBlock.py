@@ -10,9 +10,8 @@ class GraphVisualiserBlock(GraphVisualiserBase):
         return "GrafVisualiserBlock"
 
     def visualize(self, graph: Graph):
-        print("BLOCK USAO1111")
+        print("BLOCK USAO")
         block_content = blockVisualize(graph)
-        print(block_content)
         # with open('block.html', 'w', encoding="utf-8") as file:
         #     file.write(block_content)
         return block_content

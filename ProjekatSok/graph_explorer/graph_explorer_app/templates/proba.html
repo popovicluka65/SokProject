@@ -64,6 +64,11 @@
             padding: 8px;
         }
 
+        #workspace {
+            border-radius: 5px;
+            padding: 8px;
+        }
+
         #graph-view {
             height: 90vh;
             display: flex;
@@ -98,7 +103,8 @@
         $(document).ready(function(){
             var visualisers = {{ graphVisualisers|safe }};
             var parsers = {{ pluginsParsers|safe }};
-            // Funkcija za punjenje combobox-a sa opcijama
+            var workspaces = {{ unique_names|safe }};
+
             function populateVisualisersCombo(visualisers) {
                 var select = $('#select-visualiser');
                 select.empty();
@@ -116,24 +122,65 @@
                 });
             }
 
+            function populateWorkspaceCombo(workspaces) {
+                var select = $('#workspace');
+                select.empty();
+                select.append('<option disabled selected value="">Select workspace</option>');
+                workspaces.forEach(function(workspace) {
+                    select.append('<option value="' + workspace + '">' + workspace + '</option>');
+                });
+            }
+
+            function addWorkspace(selectedVisualiser,selectedParser) {
+                const request = new XMLHttpRequest();
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        populateWorkspaceCombo(unique_names);
+                    }
+                };
+
+                request.open("GET", "workspace/" + encodeURIComponent(selectedVisualiser)+"/"+encodeURIComponent(selectedParser), true);
+                request.send();
+            }
+
+
+            function applyButton(searchValue,filterValue,selectedWorkspace) {
+                const request = new XMLHttpRequest();
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+
+                }
+                };
+                request.open("GET", "search/" + encodeURIComponent(searchValue)+"/"+encodeURIComponent(filterValue) + "/"+encodeURIComponent(selectedWorkspace), true);
+                request.send();
+            }
+
             populateVisualisersCombo(visualisers);
             populateParsersCombo(parsers);
+            populateWorkspaceCombo(workspaces);
 
-             $('#apply-button').click(function(){
+            $('#apply-button').click(function(){
 
-            var selectedVisualiser = $('#select-visualiser').val();
-            var selectedParser = $('#select-parser').val();
+                var searchValue = $('input[placeholder="Search"]').val();
+                var filterValue = $('input[placeholder="Filter"]').val();
+                var selectedWorkspace = document.getElementById('workspace').value;
+                console.log(selectedWorkspace);
+                applyButton(searchValue,filterValue,selectedWorkspace);
 
+            });
 
-            var searchValue = $('input[placeholder="Search"]').val();
-            var filterValue = $('input[placeholder="Filter"]').val();
-
-            console.log("Selected Visualiser:", selectedVisualiser);
-            console.log("Selected Parser:", selectedParser);
-            console.log("Search Value:", searchValue);
-            console.log("Filter Value:", filterValue);
-
-        });
+            $('#add-workspace').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedParser = document.getElementById('select-parser').selectedIndex;
+                addWorkspace(selectedVisualiser,selectedParser);
+                addWorkspace(selectedVisualiser,selectedParser);
+            });
         });
 
     </script>
@@ -150,10 +197,14 @@
     <select id="select-parser">
     </select>
 
+    <select id="workspace">
+    </select>
+
     <input type="text" placeholder="Search">
     <input type="text" placeholder="Filter">
 
     <button id = "apply-button">Apply</button>
+     <button id = "add-workspace">Add workspace</button>
 </div>
 <div id="graph-view">
     <div id="main">
