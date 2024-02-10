@@ -3,6 +3,7 @@ Projekat/__init__.py
 Projekat/Sok/__init__.py
 Projekat/Sok/Osnova/__init__.py
 Projekat/Sok/Osnova/core_main.py
+Projekat/Sok/Osnova/graph_db_service.py
 projekat_sok_core.egg-info/PKG-INFO
 projekat_sok_core.egg-info/SOURCES.txt
 projekat_sok_core.egg-info/dependency_links.txt

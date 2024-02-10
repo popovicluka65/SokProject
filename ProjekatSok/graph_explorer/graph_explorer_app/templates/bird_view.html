@@ -1,0 +1,41 @@
+<style>
+    #bird_svg {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<svg id="bird_svg"></svg>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    function loadBirdView(e)
+    {
+        let main = d3.select("#main_svg").html();
+        d3.select("#bird_svg").html(main)
+
+        let mainGraphWidth = document.getElementById("main").clientWidth;
+        let mainGraphHeight = document.getElementById("main").clientHeight;
+        let birdViewWidth = document.getElementById("bird_svg").clientWidth;
+        let birdViewHeight = document.getElementById("bird_svg").clientHeight;
+
+        let scale = Math.min(300 / mainGraphWidth, 150 / mainGraphHeight) / 2;
+
+        let x = (birdViewWidth - mainGraphWidth * scale) / 2;
+        let y = (birdViewHeight - mainGraphHeight * scale) / 2;
+
+        d3.select("#bird_svg").select("g.links").attr("transform", "translate(" + x + "," + y + ") scale(" + scale + ")");
+        d3.select("#bird_svg").select("g.nodes").attr("transform", "translate(" + x + "," + y + ") scale(" + scale + ")");
+        d3.select("#bird_svg").select("g.labels").attr("transform", "translate(" + x + "," + y + ") scale(" + scale + ")");
+
+    }
+
+    let isLoaded = false;
+    window.onload = () => {
+        const target = d3.select("#main_svg").node();
+        const options = { subtree: true, attributes: true };
+        const observer = new MutationObserver( () => {
+                loadBirdView();
+        });
+        observer.observe(target, options);
+        }
+
+</script>

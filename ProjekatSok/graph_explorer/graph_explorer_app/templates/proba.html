@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph explorer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+            color: #00c1c8;
+            font-style: italic;
+        }
+
+        .navbar select {
+            float: left;
+            margin: 10px;
+        }
+
+        .navbar input[type="text"] {
+            float: left;
+            margin: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .navbar button {
+            float: left;
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #00c1c8;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #select-visualiser {
+            border-radius: 5px;
+            padding: 8px;
+        }
+        #select-parser {
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        #workspace {
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        #reset-graph {
+            border-radius: 5px;
+            padding: 8px;
+        }
+
+        #graph-view {
+            height: 90vh;
+            display: flex;
+            border-bottom: 1px solid #333;
+        }
+
+        #tree-bird {
+            width: 30%;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #main {
+            width: 70%;
+            overflow: hidden;
+        }
+        
+        #tree {
+            height: 70%;
+            border-bottom: 1px solid #333;
+            overflow: hidden;
+        }
+
+        #bird {
+            height: 30%;
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var csrfToken = '{{ csrf_token }}';
+        $(document).ready(function(){
+            var visualisers = {{ graphVisualisers|safe }};
+            var parsers = {{ pluginsParsers|safe }};
+            var workspaces = {{ unique_names|safe }};
+
+            function populateVisualisersCombo(visualisers) {
+                var select = $('#select-visualiser');
+                select.empty();
+                select.append('<option disabled selected value="">Select visualiser</option>');
+                visualisers.forEach(function(visualiser) {
+                    select.append('<option value="' + visualiser + '">' + visualiser + '</option>');
+                });
+            }
+            function populateParsersCombo(parsers) {
+                var select = $('#select-parser');
+                select.empty();
+                select.append('<option disabled selected value="">Select parser</option>');
+                parsers.forEach(function(parser) {
+                    select.append('<option value="' + parser + '">' + parser + '</option>');
+                });
+            }
+
+            function populateWorkspaceCombo(workspaces) {
+                var select = $('#workspace');
+                select.empty();
+                select.append('<option disabled selected value="">Select workspace</option>');
+                workspaces.forEach(function(workspace) {
+                    select.append('<option value="' + workspace + '">' + workspace + '</option>');
+                });
+            }
+
+            function addWorkspace(selectedVisualiser,selectedParser) {
+                const request = new XMLHttpRequest();
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        populateWorkspaceCombo(unique_names);
+                        data = buildGraph(graphCopy, rootNodeId);
+                        root = d3.hierarchy(data);
+                        update(null, root);
+                    }
+                };
+
+                request.open("GET", "workspace/" + encodeURIComponent(selectedVisualiser)+"/"+encodeURIComponent(selectedParser), true);
+                request.send();
+            }
+
+
+            function applyButton(searchValue,filterValue,selectedWorkspace,selectedVisualiser) {
+                const request = new XMLHttpRequest();
+
+                const url = "search/";
+
+                if(filterValue===""){
+                    filterValue="empty";
+                }else {
+                    let parts = filterValue.split(" ")
+                    if(parts.length!=3){
+                        filterValue="empty";
+                        alert("Form is not valid (form is atribute operation value)");
+                    }
+                    else if(!(parts[1]=== "<" || parts[1]=== ">" || parts[1]=== "=" || parts[1]=== "!=" || parts[1]=== "<=" || parts[1]=== ">=")){
+                        filterValue="empty";
+                        alert("Operation is <,>,=,!=,<=,>=" );
+                    }
+                }
+
+                console.log(selectedVisualiser)
+                 console.log(selectedWorkspace)
+                if(selectedVisualiser === 0 && selectedWorkspace!==""){
+                        alert("Posto niste odabrali visualizator bice prikazan neki");
+                        selectedVisualiser=1;
+                }
+
+                const data_send = JSON.stringify({
+                search_query: searchValue,
+                filter: filterValue,
+                workspace: selectedWorkspace,
+                visualiser : (selectedVisualiser-1)
+                });
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        //data = buildGraph(graphCopy, rootNodeId);
+                        //root = d3.hierarchy(data);
+                        //update(null, root);
+
+                }
+                };
+
+                request.open("POST", url, true);
+                request.setRequestHeader("Content-Type", "application/json");
+                request.setRequestHeader("X-CSRFToken", csrfToken);
+                request.send(data_send);
+            }
+            function viewWorkspace(nameWorkspace,selectedVisualiser) {
+                const request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        data = buildGraph(graphCopy, rootNodeId);
+                        root = d3.hierarchy(data);
+                        update(null, root);
+                }
+                };
+                if(selectedVisualiser === 0 && nameWorkspace!==""){
+                        alert("Posto niste odabrali visualizator bice prikazan neki");
+                        selectedVisualiser=1;
+                }
+                console.log("AVB")
+                console.log(selectedVisualiser);
+                request.open("GET", "view-workspace/" + encodeURIComponent(nameWorkspace)+"/"+ encodeURIComponent(selectedVisualiser-1), true);
+                request.send();
+            }
+
+            populateVisualisersCombo(visualisers);
+            populateParsersCombo(parsers);
+            populateWorkspaceCombo(workspaces);
+
+            $('#apply-button').click(function(){
+                var searchValue = $('input[placeholder="Search"]').val();
+                var filterValue = $('input[placeholder="Filter"]').val();
+                var selectedWorkspace = document.getElementById('workspace').value;
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                applyButton(searchValue,filterValue,selectedWorkspace,selectedVisualiser);
+
+            });
+
+            $('#add-workspace').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedParser = document.getElementById('select-parser').selectedIndex;
+                addWorkspace(selectedVisualiser,selectedParser);
+            });
+
+            $('#view-workspace').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedWorkspace = document.getElementById('workspace').value;
+                viewWorkspace(selectedWorkspace,selectedVisualiser);
+            });
+
+            $('#reset-graph').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedParser = document.getElementById('select-parser').selectedIndex;
+                var selectedWorkspace = document.getElementById('workspace').value;
+
+                const request = new XMLHttpRequest();
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        data = buildGraph(graphCopy, rootNodeId);
+                        root = d3.hierarchy(data);
+                        update(null, root);
+                    }
+                };
+                if(selectedVisualiser === 0){
+                        alert("Posto niste odabrali visualizator bice prikazan neki");
+                        selectedVisualiser=1;
+                }
+                 if(selectedParser=== 0){
+                        selectedParser=1;
+                }
+
+                request.open("GET", "reset/" + encodeURIComponent(selectedVisualiser)+"/"+encodeURIComponent(selectedParser)+"/"+encodeURIComponent(selectedWorkspace), true);
+                request.send();
+            });
+        });
+
+    </script>
+    <link rel="icon" href="data:,"> {# Here #}
+</head>
+<body>
+
+<div class="navbar">
+    <a>Graph explorer</a>
+
+    <select id="select-visualiser">
+    </select>
+
+    <select id="select-parser">
+    </select>
+    <button id = "add-workspace">Add workspace</button>
+
+    <select id="workspace">
+    </select>
+    <button id = "view-workspace">View workspace</button>
+
+    <input type="text" placeholder="Search">
+    <input type="text" placeholder="Filter">
+
+    <button id = "apply-button">Apply</button>
+    <button id = "reset-graph">Reset</button>
+
+</div>
+<div id="graph-view">
+    <div id="main">
+        {{ graph | safe }}
+    </div>
+    <div id="tree-bird">
+        <div id="tree">
+            {% include "tree_view.html" %}
+        </div>
+        <div id="bird">
+            {% include "bird_view.html" %}
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>

@@ -1,10 +1,27 @@
-from rdflib import Graph
+from decimal import Decimal
+from rdflib import Graph, URIRef
 from Projekat.Sok.Osnova.Model.graph import Graph as ourGraph, Node,Edge
-from rdflib import Literal
+from rdflib import Literal, XSD
 import os
 
 def get_absolute_path(file_path):
     return os.path.join(os.path.dirname(__file__), "..", "..", "..", "..","..", "file", file_path)
+def convertValue(obj):
+
+    if obj.datatype == URIRef(str(XSD.decimal)):
+        return float(Decimal(obj))
+    elif obj.datatype == URIRef(str(XSD.float)):
+        return float(obj)
+    elif obj.datatype == URIRef(str(XSD.double)):
+        return float(obj)
+    elif obj.datatype == URIRef(str(XSD.boolean)):
+        return bool(obj)
+    elif obj.datatype == URIRef(str(XSD.integer)):
+        return int(obj)
+    elif obj.language:
+        return str(obj)
+    else:
+        return obj.value
 def loadGraph(filePath):
     rdfGraph = Graph()
     rdfGraph.parse(get_absolute_path(filePath), format='turtle')
@@ -15,10 +32,9 @@ def loadGraph(filePath):
             graph.addNode(Node(subject, {}))
         subjectNode = graph.getNodeById(subject)
         if isinstance(obj, Literal):
-            subjectNode.value[predicate] = obj
+            subjectNode.value[predicate] = convertValue(obj)
         else:
             if graph.getNodeById(obj) is None:
                 graph.addNode(Node(obj, {}))
             graph.addEdge(Edge(subjectNode, graph.getNodeById(obj), predicate))
-    print(graph)
     return graph
