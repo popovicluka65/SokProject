@@ -69,6 +69,11 @@
             padding: 8px;
         }
 
+        #reset-graph {
+            border-radius: 5px;
+            padding: 8px;
+        }
+
         #graph-view {
             height: 90vh;
             display: flex;
@@ -83,7 +88,7 @@
         }
 
         #main {
-            width: 100%;
+            width: 70%;
             overflow: hidden;
         }
         
@@ -100,6 +105,7 @@
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        var csrfToken = '{{ csrf_token }}';
         $(document).ready(function(){
             var visualisers = {{ graphVisualisers|safe }};
             var parsers = {{ pluginsParsers|safe }};
@@ -139,6 +145,9 @@
                         var graph=request.responseText;
                         $('#main_svg').html(graph);
                         populateWorkspaceCombo(unique_names);
+                        data = buildGraph(graphCopy, rootNodeId);
+                        root = d3.hierarchy(data);
+                        update(null, root);
                     }
                 };
 
@@ -147,17 +156,73 @@
             }
 
 
-            function applyButton(searchValue,filterValue,selectedWorkspace) {
+            function applyButton(searchValue,filterValue,selectedWorkspace,selectedVisualiser) {
                 const request = new XMLHttpRequest();
+
+                const url = "search/";
+
+                if(filterValue===""){
+                    filterValue="empty";
+                }else {
+                    let parts = filterValue.split(" ")
+                    if(parts.length!=3){
+                        filterValue="empty";
+                        alert("Form is not valid (form is atribute operation value)");
+                    }
+                    else if(!(parts[1]=== "<" || parts[1]=== ">" || parts[1]=== "=" || parts[1]=== "!=" || parts[1]=== "<=" || parts[1]=== ">=")){
+                        filterValue="empty";
+                        alert("Operation is <,>,=,!=,<=,>=" );
+                    }
+                }
+
+                console.log(selectedVisualiser)
+                 console.log(selectedWorkspace)
+                if(selectedVisualiser === 0 && selectedWorkspace!==""){
+                        alert("Posto niste odabrali visualizator bice prikazan neki");
+                        selectedVisualiser=1;
+                }
+
+                const data_send = JSON.stringify({
+                search_query: searchValue,
+                filter: filterValue,
+                workspace: selectedWorkspace,
+                visualiser : (selectedVisualiser-1)
+                });
 
                 request.onreadystatechange = function () {
                     if (request.readyState === 4 && request.status === 200) {
                         var graph=request.responseText;
                         $('#main_svg').html(graph);
+                        //data = buildGraph(graphCopy, rootNodeId);
+                        //root = d3.hierarchy(data);
+                        //update(null, root);
 
                 }
                 };
-                request.open("GET", "search/" + encodeURIComponent(searchValue)+"/"+encodeURIComponent(filterValue) + "/"+encodeURIComponent(selectedWorkspace), true);
+
+                request.open("POST", url, true);
+                request.setRequestHeader("Content-Type", "application/json");
+                request.setRequestHeader("X-CSRFToken", csrfToken);
+                request.send(data_send);
+            }
+            function viewWorkspace(nameWorkspace,selectedVisualiser) {
+                const request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        data = buildGraph(graphCopy, rootNodeId);
+                        root = d3.hierarchy(data);
+                        update(null, root);
+                }
+                };
+                if(selectedVisualiser === 0 && nameWorkspace!==""){
+                        alert("Posto niste odabrali visualizator bice prikazan neki");
+                        selectedVisualiser=1;
+                }
+                console.log("AVB")
+                console.log(selectedVisualiser);
+                request.open("GET", "view-workspace/" + encodeURIComponent(nameWorkspace)+"/"+ encodeURIComponent(selectedVisualiser-1), true);
                 request.send();
             }
 
@@ -166,12 +231,11 @@
             populateWorkspaceCombo(workspaces);
 
             $('#apply-button').click(function(){
-
                 var searchValue = $('input[placeholder="Search"]').val();
                 var filterValue = $('input[placeholder="Filter"]').val();
                 var selectedWorkspace = document.getElementById('workspace').value;
-                console.log(selectedWorkspace);
-                applyButton(searchValue,filterValue,selectedWorkspace);
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                applyButton(searchValue,filterValue,selectedWorkspace,selectedVisualiser);
 
             });
 
@@ -179,7 +243,40 @@
                 var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
                 var selectedParser = document.getElementById('select-parser').selectedIndex;
                 addWorkspace(selectedVisualiser,selectedParser);
-                addWorkspace(selectedVisualiser,selectedParser);
+            });
+
+            $('#view-workspace').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedWorkspace = document.getElementById('workspace').value;
+                viewWorkspace(selectedWorkspace,selectedVisualiser);
+            });
+
+            $('#reset-graph').click(function(){
+                var selectedVisualiser = document.getElementById('select-visualiser').selectedIndex;
+                var selectedParser = document.getElementById('select-parser').selectedIndex;
+                var selectedWorkspace = document.getElementById('workspace').value;
+
+                const request = new XMLHttpRequest();
+
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4 && request.status === 200) {
+                        var graph=request.responseText;
+                        $('#main_svg').html(graph);
+                        data = buildGraph(graphCopy, rootNodeId);
+                        root = d3.hierarchy(data);
+                        update(null, root);
+                    }
+                };
+                if(selectedVisualiser === 0){
+                        alert("Posto niste odabrali visualizator bice prikazan neki");
+                        selectedVisualiser=1;
+                }
+                 if(selectedParser=== 0){
+                        selectedParser=1;
+                }
+
+                request.open("GET", "reset/" + encodeURIComponent(selectedVisualiser)+"/"+encodeURIComponent(selectedParser)+"/"+encodeURIComponent(selectedWorkspace), true);
+                request.send();
             });
         });
 
@@ -196,15 +293,18 @@
 
     <select id="select-parser">
     </select>
+    <button id = "add-workspace">Add workspace</button>
 
     <select id="workspace">
     </select>
+    <button id = "view-workspace">View workspace</button>
 
     <input type="text" placeholder="Search">
     <input type="text" placeholder="Filter">
 
     <button id = "apply-button">Apply</button>
-     <button id = "add-workspace">Add workspace</button>
+    <button id = "reset-graph">Reset</button>
+
 </div>
 <div id="graph-view">
     <div id="main">

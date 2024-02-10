@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Union
 import uuid
 from Projekat.Sok.Osnova.Model.graph import Graph as Graph, Node, Edge
@@ -110,13 +111,10 @@ def add_workspace(parser,visualiser):
     graphParsers = loadPlugins("graph.parser")
     graphVisualisers = loadPlugins("graph.visualiser")
     odabraniGraph = izabrana_opcija(graphParsers[parser])
-    print(graphVisualisers)
-    print(graphParsers)
+
     add_graph_name(odabraniGraph)
     write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
     html = izabrana_opcija(graphVisualisers[visualiser])
-    print("HTML")
-    print(html)
     return odabraniGraph, html
 
 def delete_all_graphs():
@@ -198,6 +196,20 @@ def filter_nodes(tx, f_attribute, f_operator, f_value, graph_name):     #fali qu
       END 
     RETURN n""")
     result = tx.run(query, attribute=f_attribute, operator=f_operator, value=f_value, graph_name=graph_name)
+    query1 = ("""
+        MATCH (n)-[r]-(m)
+        WHERE
+          (n.graph_name = $graph_name) AND
+          (n[$attribute] IS NOT NULL) AND 
+          CASE 
+            WHEN $operator = '=' THEN n[$attribute] = $value  AND m[$attribute] = $value
+            WHEN $operator = '!=' THEN n[$attribute] <> $value AND m[$attribute] <> $value
+            WHEN $operator = '>' THEN n[$attribute] > $value AND m[$attribute]  > $value
+            WHEN $operator = '<' THEN n[$attribute] < $value AND m[$attribute] < $value
+            ELSE FALSE 
+          END 
+         RETURN n, r, m""")
+    result1 = tx.run(query1, attribute=f_attribute, operator=f_operator, value=f_value, graph_name=graph_name)
     for record in result:
         newNodeDB = record["n"]
         attributes = dict(newNodeDB.items())
@@ -213,13 +225,20 @@ def filter_nodes(tx, f_attribute, f_operator, f_value, graph_name):     #fali qu
         if not is_node_in_graph:
             newGraph.addNode(newNode)
     added_edges = []
-    for record in result:
+    for record in result1:
         edge = record["r"]
         node1 = record["n"]
         node2 = record["m"]
-        newNode1 = Node(node1.get("id"), json.loads(node1.get("value")))
-        newNode2 = Node(node2.get("id"), json.loads(node2.get("value")))
-        # print("Node1: ", newNode1, " Node2: ", newNode2, " Edge: ", newEdge, '\n')
+        #print("")
+        #print("edge: ", edge, "\n node1:", node1,"'\n node2", node2)
+        attributes_n = dict(node1.items())
+        attributes_m = dict(node2.items())
+        id_n = attributes_n["id"]
+        id_m = attributes_m["id"]
+        del attributes_n["id"]
+        del attributes_m["id"]
+        newNode1 = Node(id_n, attributes_n,graph_name)
+        newNode2 = Node(id_m, attributes_m,graph_name)
         is_node_in_graph = False
         for indice in newGraph.indices:
             node = indice[0]
@@ -228,12 +247,14 @@ def filter_nodes(tx, f_attribute, f_operator, f_value, graph_name):     #fali qu
                 break
         if not is_node_in_graph:
             newGraph.addNode(newNode1)
-        if edge is not None and (str(newNode2.id) + str(newNode1.id)) not in added_edges:
-            newEdge = Edge(newNode1, newNode2)
-            newNode1.edges.append(newNode2)
-            newGraph.addEdge(newEdge)
-            added_edges.append(str(newNode1.id) + str(newNode2.id))
 
+        if edge is not None and (str(newNode2.id) + str(newNode1.id)) not in added_edges:
+             newEdge = Edge(newNode1, newNode2)
+             newNode1.edges.append(newNode2)
+             newGraph.addEdge(newEdge)
+             added_edges.append(str(newNode1.id) + str(newNode2.id))
+    print("FILTEEEER")
+    print(newGraph)
     return newGraph
 
 def findNodeByDict(g,nodeDict):
@@ -316,6 +337,14 @@ def search_nodes(tx, search_query, graph_name):         #ne brisu se grane nesto
 
 
 def search(search_query, attribute, operator, value, graph_name):
+    print(search_query)
+    print(graph_name)
+    print("OPERATORIII")
+    print(attribute)
+    print(operator)
+    print(value)
+
+    new_value = parse_values(value)
 
     driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
     graphVisualisers = loadPlugins("graph.visualiser")
@@ -324,25 +353,43 @@ def search(search_query, attribute, operator, value, graph_name):
             resultSearch = session.read_transaction(search_nodes, search_query, graph_name)
             delete_graph(graph_name)
             write_graph_to_neo4j(URI, USERNAME, PASSWORD, resultSearch)
-        resultFilter = session.read_transaction(filter_nodes, attribute, operator, value, graph_name)
+        resultFilter = session.read_transaction(filter_nodes, attribute, operator, new_value, graph_name)
         delete_graph(graph_name)
         write_graph_to_neo4j(URI, USERNAME, PASSWORD, resultFilter)
 
-        # for node, position in resultFilter.indices:
-        #     if graph_name in node.value:
-        #         del node.value[graph_name]
 
         globalni_niz.append(resultFilter)
 
-        stringHTML =  izabrana_opcija(graphVisualisers[0])
-        print(stringHTML)
+        stringHTML =  izabrana_opcija(graphVisualisers[1])
         return resultFilter,stringHTML
+
+def parse_values(value):
+    try:
+        # Pokušajte prvo da parsirate vrednost kao datetime.
+        new_value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
+    except ValueError:
+        # Ako to ne uspe, proverite da li se može konvertovati u int ili float.
+        try:
+            # Pokušajte prvo da konvertujete u int.
+            new_value = int(value)
+        except ValueError:
+            try:
+                # Ako to ne uspe, proverite može li se konvertovati u float.
+                new_value = float(value)
+            except ValueError:
+                # Ako ni to ne uspe, vrati originalnu string vrednost.
+                new_value = value  # Ovde se pretpostavlja da je value uvek string ako nije datetime, int, ili float.
+    return new_value
 
 def get_graph_by_name(graph_name):
     driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
+    graphVisualisers = loadPlugins("graph.visualiser")
     with driver.session() as session:
         resultSearch = session.read_transaction(get_graph_by_name_query, graph_name)
-    return resultSearch
+    globalni_niz.append(resultSearch)
+
+    stringHTML = izabrana_opcija(graphVisualisers[1])
+    return resultSearch,stringHTML
 def get_graph_by_name_query(tx, graph_name):
     newGraph = Graph()
     result = tx.run(
