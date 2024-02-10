@@ -1,4 +1,4 @@
-<!-- 
+<!--
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D3 Tree Visualization</title>
@@ -20,13 +20,14 @@
             return children;
         }
 
-        var rootNodeId=1;
         function buildGraph(graph, rootNodeId) {
             const tree = {
                 id: rootNodeId.toString(),
                 uid : uuidv4(),
+                value : {},
                 children: []
             };
+
             const children = getChildren(graph, rootNodeId);
             tree.children = children.map(child => ({ ...child, uid: uuidv4(), children: [] }));
 
@@ -84,15 +85,16 @@
             .attr("height", heightWindow)
             .attr("style", "max-width: 100%; height: 100%; font: 10px sans-serif; user-select: none;");
 
-        function zoomed(event) {
-            const { transform } = event;
-            const scaleFactor = 0.3; // Adjust this value to control the panning speed
-            const translatedX = transform.x * scaleFactor;
-            const translatedY = transform.y * scaleFactor;
-            const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
-            gNode.attr("transform", newTransform);
-            gLink.attr("transform", newTransform);
-        }
+            function zoomed(event) {
+    if (!event || !event.transform) return; // Ensure event and transform exist
+    const transform = event.transform;
+    const scaleFactor = 0.3; // Adjust this value to control the panning speed
+    const translatedX = transform.x * scaleFactor;
+    const translatedY = transform.y * scaleFactor;
+    const newTransform = d3.zoomIdentity.translate(translatedX, translatedY).scale(transform.k);
+    gNode.attr("transform", newTransform);
+    gLink.attr("transform", newTransform);
+}
         const zoom = d3.zoom()
         .scaleExtent([0.1, 10])
         .on("zoom", zoomed);
@@ -153,7 +155,7 @@
                 .attr("r", 20)
                 .attr("fill", "red")
                 .attr("stroke-width", 10);
-            
+
             nodeEnter.append("text")
                 .attr("dy", "-1em")
                 .attr("x", d => d._children ? -16 : 16)

@@ -1,0 +1,3 @@
+[console_scripts]
+projekat_main = Projekat.Sok.Osnova.core_main:main
+

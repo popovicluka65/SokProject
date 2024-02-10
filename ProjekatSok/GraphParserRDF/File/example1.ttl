@@ -62,4 +62,880 @@ ex:Person7 ex:name "Chris" .
 ex:Person7 ex:age 31 .
 
 ex:Person8 ex:name "Lily" .
+
 ex:Person8 ex:age 25 .
+ex:Person1 ex:hasSibling ex:Person4 .
+ex:Person2 ex:hasSibling ex:Person5 .
+ex:Person3 ex:hasSibling ex:Person6 .
+ex:Person4 ex:hasSibling ex:Person7 .
+ex:Person5 ex:hasSibling ex:Person8 .
+
+ex:Person1 ex:livesIn ex:Place3 .
+ex:Person2 ex:livesIn ex:Place4 .
+ex:Person3 ex:livesIn ex:Place5 .
+ex:Person4 ex:livesIn ex:Place6 .
+ex:Person5 ex:livesIn ex:Place1 .
+ex:Person6 ex:livesIn ex:Place2 .
+ex:Person7 ex:livesIn ex:Place3 .
+ex:Person8 ex:livesIn ex:Place4 .
+
+ex:Place1 ex:locatedIn ex:Place5 .
+ex:Place2 ex:locatedIn ex:Place6 .
+ex:Place3 ex:locatedIn ex:Place1 .
+ex:Place4 ex:locatedIn ex:Place2 .
+ex:Place5 ex:locatedIn ex:Place3 .
+ex:Place6 ex:locatedIn ex:Place4 .
+ex:Person9 rdf:type ex:Person ;
+    ex:name "Grace" ;
+    ex:age 29 ;
+    ex:knows ex:Person3 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "Daniel" ;
+        ex:age 33 ;
+        ex:knows ex:Person9
+    ] .
+
+ex:Place7 rdf:type ex:Place ;
+    ex:locatedIn [
+        rdf:type ex:Place ;
+        ex:name "CityCenter" ;
+        ex:locatedIn ex:Place6
+    ] .
+    ex:Person10 rdf:type ex:Person ;
+    ex:name "Oliver" ;
+    ex:age 28 ;
+    ex:knows ex:Person11 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "Emma" ;
+        ex:age 26 ;
+        ex:knows ex:Person10
+    ] .
+
+ex:Person11 rdf:type ex:Person ;
+    ex:name "Isabella" ;
+    ex:age 30 ;
+    ex:knows ex:Person12 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "James" ;
+        ex:age 29 ;
+        ex:knows ex:Person11
+    ] .
+ex:Place7 rdf:type ex:Place ;
+    ex:name "Downtown" ;
+    ex:locatedIn ex:Place8 .
+
+ex:Place8 rdf:type ex:Place ;
+    ex:name "Metropolis" ;
+    ex:locatedIn ex:Place9 .
+ex:Activity1 rdf:type ex:Activity ;
+    ex:name "Hiking" ;
+    ex:requiresEquipment "Hiking Boots" .
+
+ex:Activity2 rdf:type ex:Activity ;
+    ex:name "Cooking Class" ;
+    ex:requiresEquipment "Chef's Apron" .
+
+ex:Event1 rdf:type ex:Event ;
+    ex:name "Music Festival" ;
+    ex:heldAt ex:Place9 ;
+    ex:hasPerformer "BandXYZ" .
+
+ex:Event2 rdf:type ex:Event ;
+    ex:name "Tech Conference" ;
+    ex:heldAt ex:Place8 ;
+    ex:hasSpeaker "TechExpert123" .
+
+ex:Product1 rdf:type ex:Product ;
+    ex:name "Smartphone" ;
+    ex:brand "TechCo" ;
+    ex:price 799.99 .
+
+ex:Product2 rdf:type ex:Product ;
+    ex:name "Bookshelf" ;
+    ex:brand "FurniturePlus" ;
+    ex:price 149.99 .
+
+ex:Project1 rdf:type ex:Project ;
+    ex:name "Green Energy Initiative" ;
+    ex:hasParticipant ex:Person13 ;
+    ex:hasParticipant ex:Person14 .
+
+ex:Project2 rdf:type ex:Project ;
+    ex:name "Community Garden" ;
+    ex:hasParticipant ex:Person15 ;
+    ex:hasParticipant ex:Person16 .
+
+ex:Skill1 rdf:type ex:Skill ;
+    ex:name "Data Analysis" ;
+    ex:relatedTo ex:Project1 .
+
+ex:Skill2 rdf:type ex:Skill ;
+    ex:name "Woodworking" ;
+    ex:relatedTo ex:Project2 .
+ex:Place10 rdf:type ex:Place ;
+    ex:name "CentralHub" .
+ex:Activity2 ex:heldAt ex:Place10 .
+
+ex:Event1 ex:heldAt ex:Place10 .
+
+ex:Event2 ex:heldAt ex:Place10 .
+
+ex:Product1 ex:availableAt ex:Place10 .
+
+ex:Product2 ex:availableAt ex:Place10 .
+
+ex:Project1 ex:locatedAt ex:Place10 .
+
+ex:Project2 ex:locatedAt ex:Place10 .
+
+# Connecting participants to Place10
+ex:Person13 ex:livesIn ex:Place10 .
+ex:Person14 ex:livesIn ex:Place10 .
+ex:Person15 ex:livesIn ex:Place10 .
+ex:Person16 ex:livesIn ex:Place10 .
+
+# Connecting skills to Place10
+ex:Skill1 ex:developedAt ex:Place10 .
+ex:Skill2 ex:developedAt ex:Place10 .
+ex:Person17 rdf:type ex:Person ;
+    ex:name "Mia" ;
+    ex:age 26 ;
+    ex:knows ex:Person16 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "Ryan" ;
+        ex:age 29 ;
+        ex:knows ex:Person17
+    ] .
+
+ex:Person18 rdf:type ex:Person ;
+    ex:name "Jackson" ;
+    ex:age 31 ;
+    ex:knows ex:Person17 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "Sophia" ;
+        ex:age 27 ;
+        ex:knows ex:Person18
+    ] .
+
+# ... Repeat this pattern for additional individuals (up to Person30)
+
+ex:Place11 rdf:type ex:Place ;
+    ex:name "Suburbia" ;
+    ex:locatedIn ex:Place10 .
+
+ex:Place12 rdf:type ex:Place ;
+    ex:name "Shopping Mall" ;
+    ex:locatedIn ex:Place11 .
+
+ex:Activity3 rdf:type ex:Activity ;
+    ex:name "Photography Workshop" ;
+    ex:requiresEquipment "Digital Camera" .
+
+ex:Activity4 rdf:type ex:Activity ;
+    ex:name "Fitness Class" ;
+    ex:requiresEquipment "Exercise Mat" .
+
+ex:Event3 rdf:type ex:Event ;
+    ex:name "Art Exhibition" ;
+    ex:heldAt ex:Place12 ;
+    ex:hasPerformer "LocalArtistsGroup" .
+
+ex:Event4 rdf:type ex:Event ;
+    ex:name "Film Festival" ;
+    ex:heldAt ex:Place13 ;
+    ex:hasSpeaker "FilmDirectorXYZ" .
+
+
+ex:Product3 rdf:type ex:Product ;
+    ex:name "Laptop" ;
+    ex:brand "TechGuru" ;
+    ex:price 1299.99 .
+
+ex:Product4 rdf:type ex:Product ;
+    ex:name "Coffee Table" ;
+    ex:brand "FurnitureEmporium" ;
+    ex:price 199.99 .
+
+
+ex:Project3 rdf:type ex:Project ;
+    ex:name "Education for All" ;
+    ex:hasParticipant ex:Person19 ;
+    ex:hasParticipant ex:Person20 .
+
+ex:Project4 rdf:type ex:Project ;
+    ex:name "Renewable Energy Research" ;
+    ex:hasParticipant ex:Person21 ;
+    ex:hasParticipant ex:Person22 .
+
+
+ex:Skill3 rdf:type ex:Skill ;
+    ex:name "Graphic Design" ;
+    ex:relatedTo ex:Project3 .
+
+ex:Skill4 rdf:type ex:Skill ;
+    ex:name "Renewable Energy Engineering" ;
+    ex:relatedTo ex:Project4 .
+ex:Person31 rdf:type ex:Person ;
+    ex:name "Eleanor" ;
+    ex:age 24 ;
+    ex:knows ex:Person30 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "Lucas" ;
+        ex:age 27 ;
+        ex:knows ex:Person31
+    ] .
+
+ex:Person32 rdf:type ex:Person ;
+    ex:name "Gabriel" ;
+    ex:age 33 ;
+    ex:knows ex:Person31 ;
+    ex:hasFriend [
+        rdf:type ex:Person ;
+        ex:name "Zoe" ;
+        ex:age 25 ;
+        ex:knows ex:Person32
+    ] .
+ex:Place16 rdf:type ex:Place ;
+    ex:name "Tech Park" ;
+    ex:locatedIn ex:Place10 .
+
+ex:Place17 rdf:type ex:Place ;
+    ex:name "Beach Resort" ;
+    ex:locatedIn ex:Place16 .
+
+ex:Event7 rdf:type ex:Event ;
+    ex:name "Food Festival" ;
+    ex:heldAt ex:Place17 ;
+    ex:hasPerformer "CelebrityChefXYZ" .
+
+ex:Activity7 rdf:type ex:Activity ;
+    ex:name "Dance Class" ;
+    ex:requiresEquipment "Dance Shoes" .
+
+ex:Activity8 rdf:type ex:Activity ;
+    ex:name "Painting Workshop" ;
+    ex:requiresEquipment "Canvas and Brushes" .
+ex:Event8 rdf:type ex:Event ;
+    ex:name "Science Exhibition" ;
+    ex:heldAt ex:Place18 ;
+    ex:hasSpeaker "ScientistABC" .
+ex:Skill5 rdf:type ex:Skill ;
+    ex:name "Social Media Marketing" ;
+    ex:relatedTo ex:Project7 .
+
+ex:Skill6 rdf:type ex:Skill ;
+    ex:name "Ecology Research" ;
+    ex:relatedTo ex:Project8 .
+ex:Organization3 rdf:type ex:Organization ;
+    ex:name "Environmental Advocates Society" ;
+    ex:locatedIn ex:Place16 .
+
+ex:Organization4 rdf:type ex:Organization ;
+    ex:name "Tech Innovators Network" ;
+    ex:locatedIn ex:Place17 .
+
+ex:Organization5 rdf:type ex:Organization ;
+    ex:name "Community Arts Foundation" ;
+    ex:locatedIn ex:Place18 .
+
+ex:Organization6 rdf:type ex:Organization ;
+    ex:name "Health and Wellness Alliance" ;
+    ex:locatedIn ex:Place19 .
+
+ex:Organization7 rdf:type ex:Organization ;
+    ex:name "Education for Everyone Foundation" ;
+    ex:locatedIn ex:Place20 .
+
+ex:Organization8 rdf:type ex:Organization ;
+    ex:name "Urban Development Consortium" ;
+    ex:locatedIn ex:Place10 .
+
+ex:Organization9 rdf:type ex:Organization ;
+    ex:name "Global Tech Summit" ;
+    ex:locatedIn ex:Place11 .
+
+ex:Organization10 rdf:type ex:Organization ;
+    ex:name "Cultural Exchange Society" ;
+    ex:locatedIn ex:Place12 .
+
+ex:Organization11 rdf:type ex:Organization ;
+    ex:name "Animal Rights Advocacy Group" ;
+    ex:locatedIn ex:Place13 .
+
+ex:Organization12 rdf:type ex:Organization ;
+    ex:name "Innovation Hub" ;
+    ex:locatedIn ex:Place14 .
+ex:CircularNode1 rdf:type ex:CircularNode ;
+    ex:pointsTo ex:CircularNode2 .
+
+ex:CircularNode2 rdf:type ex:CircularNode ;
+    ex:pointsTo ex:CircularNode3 .
+
+ex:CircularNode3 rdf:type ex:CircularNode ;
+    ex:pointsTo ex:CircularNode4 .
+
+ex:CircularNode4 rdf:type ex:CircularNode ;
+    ex:pointsTo ex:CircularNode5 .
+
+ex:CircularNode5 rdf:type ex:CircularNode ;
+    ex:pointsTo ex:CircularNode6 .
+
+ex:CircularNode6 rdf:type ex:CircularNode ;
+    ex:pointsTo ex:CircularNode1 .
+ex:Person33 rdf:type ex:Person ;
+    ex:name "Olivia" ;
+    ex:age 26 ;
+    ex:knows ex:Person32 .
+
+ex:Person34 rdf:type ex:Person ;
+    ex:name "Henry" ;
+    ex:age 30 ;
+    ex:knows ex:Person33 .
+
+ex:Person35 rdf:type ex:Person ;
+    ex:name "Natalie" ;
+    ex:age 28 ;
+    ex:knows ex:Person34 .
+
+ex:Place21 rdf:type ex:Place ;
+    ex:name "Art Studio" ;
+    ex:locatedIn ex:Place10 .
+
+ex:Place22 rdf:type ex:Place ;
+    ex:name "Tech Hub" ;
+    ex:locatedIn ex:Place21 .
+
+ex:Place23 rdf:type ex:Place ;
+    ex:name "City Park" ;
+    ex:locatedIn ex:Place22 .
+
+# Relationships
+ex:Person33 ex:hasFriend ex:Person34 .
+ex:Person34 ex:hasSibling ex:Person35 .
+
+# Connecting individuals to Place23
+ex:Person33 ex:livesIn ex:Place23 .
+ex:Person34 ex:livesIn ex:Place23 .
+ex:Person35 ex:livesIn ex:Place23 .
+
+# Connecting Place23 to Place10
+ex:Place23 ex:locatedIn ex:Place10 .
+
+# Connecting individuals to Place22
+ex:Person32 ex:livesIn ex:Place22 .
+
+# Connecting Place22 to Place21
+ex:Place22 ex:locatedIn ex:Place21 .
+
+# Connecting Place21 to Place10
+ex:Place21 ex:locatedIn ex:Place10 .
+
+ex:Person36 rdf:type ex:Person ;
+    ex:name "Max" ;
+    ex:age 32 ;
+    ex:knows ex:Person35 .
+
+ex:Person37 rdf:type ex:Person ;
+    ex:name "Ava" ;
+    ex:age 29 ;
+    ex:knows ex:Person36 .
+
+ex:Person38 rdf:type ex:Person ;
+    ex:name "Leo" ;
+    ex:age 28 ;
+    ex:knows ex:Person37 .
+
+ex:Place24 rdf:type ex:Place ;
+    ex:name "Gym" ;
+    ex:locatedIn ex:Place10 .
+
+ex:Place25 rdf:type ex:Place ;
+    ex:name "Bookstore" ;
+    ex:locatedIn ex:Place24 .
+
+ex:Place26 rdf:type ex:Place ;
+    ex:name "Botanical Garden" ;
+    ex:locatedIn ex:Place25 .
+
+# Relationships
+ex:Person35 ex:hasFriend ex:Person36 .
+ex:Person36 ex:hasSibling ex:Person37 .
+ex:Person37 ex:hasFriend ex:Person38 .
+
+# Connecting individuals to Place26
+ex:Person38 ex:livesIn ex:Place26 .
+
+# Connecting Place26 to Place25
+ex:Place26 ex:locatedIn ex:Place25 .
+
+# Connecting Place25 to Place24
+ex:Place25 ex:locatedIn ex:Place24 .
+
+# Connecting Place24 to Place10
+ex:Place24 ex:locatedIn ex:Place10 .
+ex:Person39 rdf:type ex:Person ;
+    ex:name "Sarah" ;
+    ex:age 30 .
+
+ex:Person40 rdf:type ex:Person ;
+    ex:name "Daniel" ;
+    ex:age 35 .
+
+ex:Person41 rdf:type ex:Person ;
+    ex:name "Sophia" ;
+    ex:age 28 .
+
+ex:Place27 rdf:type ex:Place ;
+    ex:name "Park" .
+
+ex:Place28 rdf:type ex:Place ;
+    ex:name "Café" .
+
+ex:Place29 rdf:type ex:Place ;
+    ex:name "Art Gallery" .
+
+# Relationships
+ex:Person39 ex:knows ex:Person40 .
+ex:Person40 ex:hasFriend ex:Person41 .
+
+# Connecting individuals to Place29
+ex:Person41 ex:livesIn ex:Place29 .
+
+# Connecting Place29 to Place28
+ex:Place29 ex:locatedIn ex:Place28 .
+
+# Connecting Place28 to Place27
+ex:Place28 ex:locatedIn ex:Place27 .
+# Organizations (Companies)
+ex:Company1 rdf:type ex:Organization ;
+    ex:name "TechSolutions" ;
+    ex:locatedIn ex:Place10 .
+
+ex:Company2 rdf:type ex:Organization ;
+    ex:name "InnovateCorp" ;
+    ex:locatedIn ex:Place11 .
+
+ex:Company3 rdf:type ex:Organization ;
+    ex:name "GlobalTechCo" ;
+    ex:locatedIn ex:Place12 .
+
+ex:Company4 rdf:type ex:Organization ;
+    ex:name "BioInnovations" ;
+    ex:locatedIn ex:Place13 .
+
+ex:Company5 rdf:type ex:Organization ;
+    ex:name "GreenEnergy Ltd" ;
+    ex:locatedIn ex:Place14 .
+
+ex:Company6 rdf:type ex:Organization ;
+    ex:name "CreativeDesigns" ;
+    ex:locatedIn ex:Place16 .
+
+ex:Company7 rdf:type ex:Organization ;
+    ex:name "HealthTech Innovations" ;
+    ex:locatedIn ex:Place17 .
+
+ex:Company8 rdf:type ex:Organization ;
+    ex:name "CityBuilders" ;
+    ex:locatedIn ex:Place18 .
+
+ex:Company9 rdf:type ex:Organization ;
+    ex:name "FinanceMasters" ;
+    ex:locatedIn ex:Place19 .
+
+ex:Company10 rdf:type ex:Organization ;
+    ex:name "GreenTech Solutions" ;
+    ex:locatedIn ex:Place20 .
+
+# Relationships (Person working at Company)
+ex:Person13 ex:worksAt ex:Company1 .
+
+ex:Person15 ex:worksAt ex:Company2 .
+ex:Person16 ex:worksAt ex:Company2 .
+
+ex:Person17 ex:worksAt ex:Company3 .
+
+ex:Person19 ex:worksAt ex:Company4 .
+
+ex:Person21 ex:worksAt ex:Company5 .
+
+ex:Person23 ex:worksAt ex:Company6 .
+
+ex:Person25 ex:worksAt ex:Company7 .
+
+ex:Person27 ex:worksAt ex:Company8 .
+
+ex:Person29 ex:worksAt ex:Company9 .
+
+ex:Person31 ex:worksAt ex:Company10 .
+# Additional Places
+ex:Place21 rdf:type ex:Place ;
+    ex:name "TechHub City" .
+
+ex:Place22 rdf:type ex:Place ;
+    ex:name "Mountain Retreat" .
+
+ex:Place23 rdf:type ex:Place ;
+    ex:name "Oceanfront Paradise" .
+
+ex:Place24 rdf:type ex:Place ;
+    ex:name "Historic District" .
+
+ex:Place25 rdf:type ex:Place ;
+    ex:name "Garden Haven" .
+
+ex:Place26 rdf:type ex:Place ;
+    ex:name "Skyline Towers" .
+
+ex:Place27 rdf:type ex:Place ;
+    ex:name "Island Oasis" .
+
+ex:Place28 rdf:type ex:Place ;
+    ex:name "Countryside Village" .
+
+ex:Place29 rdf:type ex:Place ;
+    ex:name "Metropolitan Center" .
+
+ex:Place30 rdf:type ex:Place ;
+    ex:name "Lakeside Haven" .
+ex:Person33 rdf:type ex:Person ;
+    ex:name "Natalie" ;
+    ex:age 28 ;
+    ex:knows ex:Person32 ;
+    ex:livesIn ex:Place21 .
+
+ex:Person34 rdf:type ex:Person ;
+    ex:name "Alex" ;
+    ex:age 30 ;
+    ex:knows ex:Person33 ;
+    ex:livesIn ex:Place22 .
+
+ex:Person35 rdf:type ex:Person ;
+    ex:name "Victoria" ;
+    ex:age 25 ;
+    ex:knows ex:Person34 ;
+    ex:livesIn ex:Place23 .
+
+ex:Person36 rdf:type ex:Person ;
+    ex:name "Dylan" ;
+    ex:age 32 ;
+    ex:knows ex:Person35 ;
+    ex:livesIn ex:Place24 .
+
+ex:Person37 rdf:type ex:Person ;
+    ex:name "Megan" ;
+    ex:age 29 ;
+    ex:knows ex:Person36 ;
+    ex:livesIn ex:Place25 .
+
+ex:Person38 rdf:type ex:Person ;
+    ex:name "Ryan" ;
+    ex:age 27 ;
+    ex:knows ex:Person37 ;
+    ex:livesIn ex:Place26 .
+
+ex:Person39 rdf:type ex:Person ;
+    ex:name "Zoe" ;
+    ex:age 31 ;
+    ex:knows ex:Person38 ;
+    ex:livesIn ex:Place27 .
+
+ex:Person40 rdf:type ex:Person ;
+    ex:name "Lucas" ;
+    ex:age 26 ;
+    ex:knows ex:Person39 ;
+    ex:livesIn ex:Place28 .
+
+ex:Person41 rdf:type ex:Person ;
+    ex:name "Sophia" ;
+    ex:age 33 ;
+    ex:knows ex:Person40 ;
+    ex:livesIn ex:Place29 .
+
+ex:Person42 rdf:type ex:Person ;
+    ex:name "Olivia" ;
+    ex:age 30 ;
+    ex:knows ex:Person41 ;
+    ex:livesIn ex:Place30 .
+# Additional Events
+ex:Event9 rdf:type ex:Event ;
+    ex:name "Fashion Show" ;
+    ex:heldAt ex:Place31 ;
+    ex:hasPerformer "TopDesignersGroup" .
+
+ex:Event10 rdf:type ex:Event ;
+    ex:name "Startup Pitch Competition" ;
+    ex:heldAt ex:Place32 ;
+    ex:hasSpeaker "InvestorXYZ" .
+
+ex:Event11 rdf:type ex:Event ;
+    ex:name "Fitness Expo" ;
+    ex:heldAt ex:Place33 ;
+    ex:hasPerformer "FitnessGurus" .
+
+ex:Event12 rdf:type ex:Event ;
+    ex:name "Artisan Market" ;
+    ex:heldAt ex:Place34 ;
+    ex:hasPerformer "LocalArtisans" .
+
+ex:Event13 rdf:type ex:Event ;
+    ex:name "Book Fair" ;
+    ex:heldAt ex:Place35 ;
+    ex:hasSpeaker "AuthorABC" .
+
+ex:Event14 rdf:type ex:Event ;
+    ex:name "Technology Showcase" ;
+    ex:heldAt ex:Place36 ;
+    ex:hasPerformer "InnovativeTechCo" .
+
+ex:Event15 rdf:type ex:Event ;
+    ex:name "Culinary Workshop" ;
+    ex:heldAt ex:Place37 ;
+    ex:hasPerformer "ChefMaster" .
+
+ex:Event16 rdf:type ex:Event ;
+    ex:name "Gaming Tournament" ;
+    ex:heldAt ex:Place38 ;
+    ex:hasPerformer "GamingChampions" .
+
+ex:Event17 rdf:type ex:Event ;
+    ex:name "Science Fair" ;
+    ex:heldAt ex:Place39 ;
+    ex:hasSpeaker "ScientistXYZ" .
+
+ex:Event18 rdf:type ex:Event ;
+    ex:name "Musician's Jam Session" ;
+    ex:heldAt ex:Place40 ;
+    ex:hasPerformer "MusicEnsemble" .
+
+ex:Event19 rdf:type ex:Event ;
+    ex:name "Dance Showcase" ;
+    ex:heldAt ex:Place41 ;
+    ex:hasPerformer "DanceCrew" .
+
+ex:Event20 rdf:type ex:Event ;
+    ex:name "Photography Exhibition" ;
+    ex:heldAt ex:Place42 ;
+    ex:hasPerformer "PhotographyEnthusiasts" .
+
+ex:Event21 rdf:type ex:Event ;
+    ex:name "Health and Wellness Expo" ;
+    ex:heldAt ex:Place43 ;
+    ex:hasPerformer "WellnessExperts" .
+
+ex:Event22 rdf:type ex:Event ;
+    ex:name "Film Premiere" ;
+    ex:heldAt ex:Place44 ;
+    ex:hasSpeaker "FilmDirectorABC" .
+
+ex:Event23 rdf:type ex:Event ;
+    ex:name "Educational Summit" ;
+    ex:heldAt ex:Place45 ;
+    ex:hasSpeaker "EducationExpertXYZ" .
+
+ex:Event24 rdf:type ex:Event ;
+    ex:name "Automotive Show" ;
+    ex:heldAt ex:Place46 ;
+    ex:hasPerformer "AutoInnovators" .
+
+ex:Event25 rdf:type ex:Event ;
+    ex:name "Traveler's Meetup" ;
+    ex:heldAt ex:Place47 ;
+    ex:hasSpeaker "TravelExplorer" .
+
+ex:Event26 rdf:type ex:Event ;
+    ex:name "Environmental Forum" ;
+    ex:heldAt ex:Place48 ;
+    ex:hasSpeaker "EnvironmentalAdvocate" .
+
+ex:Event27 rdf:type ex:Event ;
+    ex:name "Business Networking Gala" ;
+    ex:heldAt ex:Place49 ;
+    ex:hasSpeaker "BusinessMogul" .
+
+ex:Event28 rdf:type ex:Event ;
+    ex:name "Astronomy Night" ;
+    ex:heldAt ex:Place50 ;
+    ex:hasSpeaker "AstronomerABC" .
+# Totally New Nodes
+ex:NewNode1 rdf:type ex:NewType ;
+    ex:property1 "Value1" ;
+    ex:property2 "Value2" .
+
+ex:NewNode2 rdf:type ex:NewType ;
+    ex:property1 "Value3" ;
+    ex:property2 "Value4" .
+
+ex:NewNode3 rdf:type ex:NewType ;
+    ex:property1 "Value5" ;
+    ex:property2 "Value6" .
+
+ex:NewNode4 rdf:type ex:NewType ;
+    ex:property1 "Value7" ;
+    ex:property2 "Value8" .
+
+ex:NewNode5 rdf:type ex:NewType ;
+    ex:property1 "Value9" ;
+    ex:property2 "Value10" .
+
+ex:NewNode6 rdf:type ex:NewType ;
+    ex:property1 "Value11" ;
+    ex:property2 "Value12" .
+
+ex:NewNode7 rdf:type ex:NewType ;
+    ex:property1 "Value13" ;
+    ex:property2 "Value14" .
+
+ex:NewNode8 rdf:type ex:NewType ;
+    ex:property1 "Value15" ;
+    ex:property2 "Value16" .
+
+ex:NewNode9 rdf:type ex:NewType ;
+    ex:property1 "Value17" ;
+    ex:property2 "Value18" .
+
+ex:NewNode10 rdf:type ex:NewType ;
+    ex:property1 "Value19" ;
+    ex:property2 "Value20" .
+# Car Nodes
+ex:Car1 rdf:type ex:Car ;
+    ex:brand "Toyota" ;
+    ex:model "Camry" ;
+    ex:year 2022 ;
+    ex:color "Silver" .
+
+ex:Car2 rdf:type ex:Car ;
+    ex:brand "Honda" ;
+    ex:model "Civic" ;
+    ex:year 2023 ;
+    ex:color "Blue" .
+
+ex:Car3 rdf:type ex:Car ;
+    ex:brand "Ford" ;
+    ex:model "Escape" ;
+    ex:year 2021 ;
+    ex:color "Black" .
+
+ex:Car4 rdf:type ex:Car ;
+    ex:brand "Chevrolet" ;
+    ex:model "Malibu" ;
+    ex:year 2020 ;
+    ex:color "Red" .
+
+ex:Car5 rdf:type ex:Car ;
+    ex:brand "Nissan" ;
+    ex:model "Altima" ;
+    ex:year 2022 ;
+    ex:color "White" .
+
+ex:Car6 rdf:type ex:Car ;
+    ex:brand "BMW" ;
+    ex:model "X5" ;
+    ex:year 2023 ;
+    ex:color "Gray" .
+
+ex:Car7 rdf:type ex:Car ;
+    ex:brand "Mercedes-Benz" ;
+    ex:model "E-Class" ;
+    ex:year 2021 ;
+    ex:color "Green" .
+
+ex:Car8 rdf:type ex:Car ;
+    ex:brand "Audi" ;
+    ex:model "A4" ;
+    ex:year 2020 ;
+    ex:color "Yellow" .
+
+ex:Car9 rdf:type ex:Car ;
+    ex:brand "Hyundai" ;
+    ex:model "Tucson" ;
+    ex:year 2022 ;
+    ex:color "Purple" .
+
+ex:Car10 rdf:type ex:Car ;
+    ex:brand "Kia" ;
+    ex:model "Sorento" ;
+    ex:year 2023 ;
+    ex:color "Orange" .
+ex:RootNode ex:hasChild ex:Node1 .
+
+ex:Node1 ex:hasChild ex:Node2 .
+ex:Node1 ex:hasChild ex:Node3 .
+
+ex:Node2 ex:hasChild ex:Node4 .
+ex:Node2 ex:hasChild ex:Node5 .
+
+ex:Node3 ex:hasChild ex:Node6 .
+ex:Node3 ex:hasChild ex:Node7 .
+
+ex:Node4 ex:hasChild ex:Node8 .
+ex:Node4 ex:hasChild ex:Node9 .
+
+ex:Node5 ex:hasChild ex:Node10 .
+ex:Node5 ex:hasChild ex:Node11 .
+
+ex:Node6 ex:hasChild ex:Node12 .
+ex:Node6 ex:hasChild ex:Node13 .
+
+ex:Node7 ex:hasChild ex:Node14 .
+ex:Node7 ex:hasChild ex:Node15 .
+
+ex:Person1 ex:hasTree ex:RootNode .
+
+ex:Airplane1 rdf:type ex:Airplane ;
+    ex:model "Boeing 747" ;
+    ex:manufacturer "Boeing" .
+
+ex:Airplane2 rdf:type ex:Airplane ;
+    ex:model "Airbus A380" ;
+    ex:manufacturer "Airbus" .
+
+ex:Airplane3 rdf:type ex:Airplane ;
+    ex:model "Embraer E190" ;
+    ex:manufacturer "Embraer" .
+
+ex:Airplane4 rdf:type ex:Airplane ;
+    ex:model "Bombardier CRJ900" ;
+    ex:manufacturer "Bombardier" .
+
+ex:Airplane5 rdf:type ex:Airplane ;
+    ex:model "Cessna 172" ;
+    ex:manufacturer "Cessna" .
+
+ex:Airplane6 rdf:type ex:Airplane ;
+    ex:model "Gulfstream G650" ;
+    ex:manufacturer "Gulfstream" .
+
+ex:Airplane7 rdf:type ex:Airplane ;
+    ex:model "Dassault Falcon 7X" ;
+    ex:manufacturer "Dassault" .
+
+ex:Airplane8 rdf:type ex:Airplane ;
+    ex:model "Boeing 787 Dreamliner" ;
+    ex:manufacturer "Boeing" .
+
+ex:Airplane9 rdf:type ex:Airplane ;
+    ex:model "Airbus A320" ;
+    ex:manufacturer "Airbus" .
+
+ex:Airplane10 rdf:type ex:Airplane ;
+    ex:model "Cessna Citation X" ;
+    ex:manufacturer "Cessna" .
+
+ex:Person4 ex:worksFor ex:Airplane9 .
+
+ex:Person3 ex:worksFor ex:Airplane8 .
+
+ex:Person4 ex:owns ex:Car6 .
+
+ex:Person3 ex:owns ex:Car8 .
+
+ex:NewNode1 ex:pointsTo ex:CircularNode1.
+
+ex:CircularNode1 ex:pointsTo ex:Car10 .

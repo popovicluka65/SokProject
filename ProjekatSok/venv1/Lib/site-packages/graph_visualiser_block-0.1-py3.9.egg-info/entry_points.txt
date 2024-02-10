@@ -1,0 +1,3 @@
+[graph.visualiser]
+visualiser_block = Projekat.Sok.Plagini.graphVisualiserBlock:GraphVisualiserBlock
+
