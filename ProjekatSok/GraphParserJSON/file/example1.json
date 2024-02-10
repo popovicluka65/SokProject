@@ -1,6 +1,6 @@
 {
     "@id": "28dddab1",
-    "name": "M'm parent",
+    "name": "I'm parent",
     "children": [
       {
         "@id": "6616c5989",
@@ -9,17 +9,17 @@
         "children": [
           {
             "@id": "6616c5981",
-            "name": "I'm first child",
+            "name": "2024-02-10T00:20:20.872Z",
             "@ref": "6616c5989"
           },
           {
             "@id": "940e60e417",
-            "name": "A'm second child",
+            "name": 6,
             "@ref": "6616c5989",
             "children": [
               {
                 "@id": "6616c59812",
-                "name": "I'm first child",
+                "name": "2024-02-01T00:20:20.872Z",
                 "@ref": "940e60e417"
               },
               {
