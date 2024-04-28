@@ -4,59 +4,55 @@ from Projekat.Sok.Osnova.Services.graph import (
     GraphParserBase
 )
 
-
-
 def consoleMenu(*args, **kwargs):
     plugins: List[Union] = kwargs.get("graphParsers", []) + kwargs.get("graphVisualisers",[])  # ovde treba da ide typing Union[GraphParserBase, GraphVisualiserBase] ali za sad ne
     if not plugins:
-        print("Nije prepoznati nijedan plugin!")
+        print("No plugins were recognized!")
         return
     error = False
     message = None
     while True:
         print("-----------------------------------")
         if error:
-            print("Pogresna vrednost uneta")
+            print("Incorrect value entered")
             error = False
         if message:
             print(message)
-        print("Opcije: ")
+        print("Options: ")
         for i, plugin in enumerate(plugins):
             print(f"{i} {plugin.identifier()}")
-        print(f"{len(plugins)} za izlaz")
+        print(f"{len(plugins)} for exit")
         try:
-            choice = int(input("Unesite redni broj opcije:"))
+            choice = int(input("Select number of option:"))
         except:
             error = True
             continue
         if choice == len(plugins):
             return
         elif 0 <= choice < len(plugins):
-            poruka = izabrana_opcija(plugins[choice], **kwargs)
+            poruka = selected_option(plugins[choice], **kwargs)
         else:
             error = True
     return ""
 
-
-def izabrana_opcija(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwargs):
-    global globalni_niz
+def selected_option(plugin: Union[GraphVisualiserBase, GraphParserBase], **kwargs):
+    global global_array
     try:
         if isinstance(plugin, GraphParserBase):
-            # graf = plugin.load(kwargs["file"])
             if (type(plugin).__name__ == "GraphParserRDF"):
                 graf = plugin.load("example1.ttl")
             else:
                 graf = plugin.load("example1.json")
-            globalni_niz.append(graf)
+            global_array.append(graf)
             return graf
         if isinstance(plugin, GraphVisualiserBase):
-            return plugin.visualize(globalni_niz[-1])
+            return plugin.visualize(global_array[-1])
     except Exception as e:
         print(f"Error: {e}")
-    return "Radi"
+    return "Do"
 
 
-def loadPlugins(pointName: str):
+def load_plugins(pointName: str):
     plugins = []
     for ep in pkg_resources.iter_entry_points(group=pointName):
         p = ep.load()
@@ -67,7 +63,7 @@ def loadPlugins(pointName: str):
 
 def search(search_query,graph_name,visualiser, attribute="", operator="", value=""):
     driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
-    graphVisualisers = loadPlugins("graph.visualiser")
+    graph_visualisers = load_plugins("graph.visualiser")
     with driver.session() as session:
         if(search_query!=""):
             resultSearch = session.read_transaction(search_nodes, search_query, graph_name)
@@ -81,56 +77,54 @@ def search(search_query,graph_name,visualiser, attribute="", operator="", value=
             delete_graph(graph_name)
             write_graph_to_neo4j(URI, USERNAME, PASSWORD, resultFilter)
 
-        globalni_niz.append(resultFilter)
-        stringHTML =  izabrana_opcija(graphVisualisers[visualiser])
+        global_array.append(resultFilter)
+        stringHTML =  selected_option(graph_visualisers[visualiser])
         return resultFilter,stringHTML
 def plugin_visualisators():
-    graphVisualisers = loadPlugins("graph.visualiser")
+    graphVisualisers = load_plugins("graph.visualiser")
     plugin_names = [type(plugin).__name__ for plugin in graphVisualisers]
     return plugin_names
 
 def plugin_parsers():
-    graphVisualisers = loadPlugins("graph.parser")
+    graphVisualisers = load_plugins("graph.parser")
     plugin_names = [type(plugin).__name__ for plugin in graphVisualisers]
     return plugin_names
 
 def main():
-    graphParsers = loadPlugins("graph.parser")
-    graphVisualisers = loadPlugins("graph.visualiser")
+    graphParsers = load_plugins("graph.parser")
+    graphVisualisers = load_plugins("graph.visualiser")
 
     consoleMenu(graphParsers=graphParsers,
                 graphVisualisers=graphVisualisers,
                 file="example1.json")
 
-
-
 def initialization():
     delete_all_graphs()
-    if len(loadPlugins("graph.parser")) == 0 or len(loadPlugins("graph.visualiser")) == 0:
+    if len(load_plugins("graph.parser")) == 0 or len(load_plugins("graph.visualiser")) == 0:
         return Graph(), ""
-    odabraniGraph, stringReprezentaicija = add_workspace(0,0)
-    return odabraniGraph, stringReprezentaicija
+    selected_graph, string_representation = add_workspace(0,0)
+    return selected_graph, string_representation
 
 def add_workspace(parser,visualiser):
-    graphParsers = loadPlugins("graph.parser")
-    graphVisualisers = loadPlugins("graph.visualiser")
-    odabraniGraph = izabrana_opcija(graphParsers[parser])
+    graph_parsers = load_plugins("graph.parser")
+    graph_visualisers = load_plugins("graph.visualiser")
+    selected_graph = selected_option(graph_parsers[parser])
 
-    add_graph_name(odabraniGraph)
-    write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
-    html = izabrana_opcija(graphVisualisers[visualiser])
-    return odabraniGraph, html
+    add_graph_name(selected_graph)
+    write_graph_to_neo4j(URI, USERNAME, PASSWORD,selected_graph)
+    html = selected_option(graph_visualisers[visualiser])
+    return selected_graph, html
 
 def reset_graph(visualiser,parser,workspace):
-    graphParsers = loadPlugins("graph.parser")
-    graphVisualisers = loadPlugins("graph.visualiser")
-    odabraniGraph = izabrana_opcija(graphParsers[parser-1])
+    graph_parsers = load_plugins("graph.parser")
+    graph_visualisers = load_plugins("graph.visualiser")
+    selected_graph = selected_option(graph_parsers[parser-1])
     graph_name = "" + str(workspace)
-    for node, position in odabraniGraph.indices:
+    for node, position in selected_graph.indices:
         node.graph_name = graph_name
-    write_graph_to_neo4j(URI, USERNAME, PASSWORD, odabraniGraph)
-    html = izabrana_opcija(graphVisualisers[visualiser-1])
-    return odabraniGraph, html
+    write_graph_to_neo4j(URI, USERNAME, PASSWORD, selected_graph)
+    html = selected_option(graph_visualisers[visualiser-1])
+    return selected_graph, html
 def parse_values(value):
     try:
         new_value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -146,15 +140,13 @@ def parse_values(value):
 
 def get_graph_by_name(graph_name, visualiser):
     driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
-    graphVisualisers = loadPlugins("graph.visualiser")
+    graph_visualisers = load_plugins("graph.visualiser")
     with driver.session() as session:
-        resultSearch = session.read_transaction(get_graph_by_name_query, graph_name)
-    globalni_niz.append(resultSearch)
+        result_search = session.read_transaction(get_graph_by_name_query, graph_name)
+    global_array.append(result_search)
 
-    stringHTML = izabrana_opcija(graphVisualisers[visualiser])
-    return resultSearch,stringHTML
-
-
+    string_html = selected_option(graph_visualisers[visualiser])
+    return result_search,string_html
 
 if __name__ == "__main__":
     main()

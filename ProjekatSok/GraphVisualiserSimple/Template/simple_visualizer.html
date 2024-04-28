@@ -122,7 +122,7 @@
     .append("circle")
     .attr("r", 10)
     .on("click", function(d) {
-        alert("ID čvora: " + d.id);
+        alert("ID node: " + d.id);
         rootNodeId = d.id;
         data = buildGraph(graphCopy, rootNodeId);
         root = d3.hierarchy(data);
