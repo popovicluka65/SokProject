@@ -65,30 +65,30 @@ class CyklicGraph(GraphHandler):
                 if connection in key:
                     attribute=current[connection]
                     nodes=self.findNodeByRef(g,attribute)
-                    if nodes!=[]:
+                    if nodes:
                         for node in nodes:
                             edges.append(node)
             new_node.edges=edges
             new_node.value=attributes
     def parseEdges(self,g):
         for node, position in g.indices:
-            if node.edges != []:
+            if node.edges:
                 new_att = {}
                 for att in node.value:
                     if att != connection:
                         new_att[att] = node.value[att]
                 node.value = new_att
-                for nodeE in node.edges:
-                    nodeFull=self.findNodeByDict(g,nodeE)
-                    if nodeFull is None:
-                        if connection in nodeE:
-                            del nodeE[connection]
-                            nodeFull = self.findNodeByDict(g, nodeE)
-                            if nodeFull is not None:
-                                e=Edge(node,nodeFull)
+                for edges in node.edges:
+                    node_full=self.findNodeByDict(g,edges)
+                    if node_full is None:
+                        if connection in edges:
+                            del edges[connection]
+                            node_full = self.findNodeByDict(g, edges)
+                            if node_full is not None:
+                                e=Edge(node,node_full)
                                 g.addEdge(e)
                     else:
-                        e = Edge(node, nodeFull)
+                        e = Edge(node, node_full)
                         g.addEdge(e)
 
 class AcyklicGraph(GraphHandler):
@@ -97,7 +97,6 @@ class AcyklicGraph(GraphHandler):
         q=Queue()
         q.put(obj)
         visited.append(obj)
-        node_id = len(g)+1
         while not q.empty():
             current=q.get()
             node_id = len(g)+1
@@ -119,11 +118,10 @@ class AcyklicGraph(GraphHandler):
 
     def parseEdges(self,g):
         for node,position in g.indices:
-            if node.edges!=[]:
-                for nodeE in node.edges:
-                    nodeFull=self.findNodeByDict(g,nodeE)
-                    if nodeFull is not None:
-                        e=Edge(node,nodeFull)
+                for edges in node.edges:
+                    node_full=self.findNodeByDict(g,edges)
+                    if node_full is not None:
+                        e=Edge(node,node_full)
                         g.addEdge(e)
 
 class LoadGraph:
@@ -140,23 +138,17 @@ class LoadGraph:
     @graphParser.setter
     def graphParser(self, new_graphParser: GraphHandler):
         self._graphParser = new_graphParser
-
     def load_graph(self, g,obj):
         self.graphParser.parseNodes(g,obj)
         self.graphParser.parseEdges(g)
-        print(g)
-
     def has_cycle(self,obj):
-        if connection in json.dumps(obj):
-            return True
-        return False
+        return connection in json.dumps(obj)
 
 def loadGraph(fileJSON):
     absolute_path=get_absolute_path(fileJSON)
     with open(absolute_path, 'r') as file:
-        obj2 = json.load(file)
+        obj = json.load(file)
     graph=Graph()
-    g = LoadGraph(obj2)
-    g.load_graph(graph,obj2)
-    print(graph)
+    g = LoadGraph(obj)
+    g.load_graph(graph,obj)
     return graph
