@@ -6,8 +6,7 @@ import pkg_resources
 from neo4j import GraphDatabase
 from neomodel import db
 
-
-globalni_niz = []
+global_array = []
 
 URI = "bolt://localhost:7687"
 USERNAME = "neo4j"
@@ -90,8 +89,6 @@ def filter_nodes(tx, f_attribute, f_operator, f_value, graph_name):     #fali qu
              newNode1.edges.append(newNode2)
              newGraph.addEdge(newEdge)
              added_edges.append(str(newNode1.id) + str(newNode2.id))
-    print("FILTEEEER")
-    print(newGraph)
     return newGraph
 
 def search_nodes(tx, search_query, graph_name):         #ne brisu se grane nesto

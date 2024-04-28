@@ -27,7 +27,6 @@ def loadGraph(filePath):
     rdfGraph.parse(get_absolute_path(filePath), format='turtle')
     graph = ourGraph()
     for subject, predicate, obj in rdfGraph:
-        #print(f"Subject: {subject}, Predicate: {predicate}, Object: {obj}")
         if graph.getNodeById(subject) is None:
             graph.addNode(Node(subject, {}))
         subjectNode = graph.getNodeById(subject)
